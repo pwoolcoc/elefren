@@ -1,16 +1,30 @@
+sudo: required
 language: rust
+dist: trusty
+addons:
+  apt:
+    packages:
+      - libssl-dev
+cache: cargo
 rust:
   - stable
   - beta
   - nightly
 before_script:
-  - bash -c 'if [[ "$TRAVIS_RUST_VERSION" == "nightly"* ]]; then rustup component add rustfmt-preview; fi'
+  - |
+    if [[ "$TRAVIS_RUST_VERSION" == "nightly"* ]]; then rustup component add rustfmt-preview; fi
 script:
-  - bash -c 'if [[ "$TRAVIS_RUST_VERSION" == "nightly"* ]]; then cargo fmt --all -- --check; fi'
+  - |
+    if [[ "$TRAVIS_RUST_VERSION" == "nightly"* ]]; then cargo fmt --all -- --check; fi
   - cargo build
   - cargo build --features toml
   - cargo build --features all
   - cargo test --features all
+after_success: |
+  if [[ "$TRAVIS_RUST_VERSION" == stable ]]; then
+    RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo install cargo-tarpaulin
+    cargo tarpaulin --ciserver travis-ci --coveralls $TRAVIS_JOB_ID
+  fi
 matrix:
   allow_failures:
     - rust: nightly

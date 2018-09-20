@@ -1,9 +1,7 @@
 use super::{deserialise, Mastodon, Result};
 use entities::itemsiter::ItemsIter;
-use reqwest::{
-    header::{Link, RelationType},
-    Response,
-};
+use hyper_old_types::header::{parsing, Link, RelationType};
+use reqwest::{header::LINK, Response};
 use serde::Deserialize;
 use url::Url;
 
@@ -32,7 +30,7 @@ macro_rules! pages {
                 };
 
                 let response = self.mastodon.send(
-                    &mut self.mastodon.client.get(url)
+                    self.mastodon.client.get(url)
                 )?;
 
                 let (prev, next) = get_links(&response)?;
@@ -108,7 +106,10 @@ fn get_links(response: &Response) -> Result<(Option<Url>, Option<Url>)> {
     let mut prev = None;
     let mut next = None;
 
-    if let Some(link_header) = response.headers().get::<Link>() {
+    if let Some(link_header) = response.headers().get(LINK) {
+        let link_header = link_header.to_str().unwrap();
+        let link_header = link_header.as_bytes();
+        let link_header: Link = parsing::from_raw_str(&link_header).unwrap();
         for value in link_header.values() {
             if let Some(relations) = value.rel() {
                 if relations.contains(&RelationType::Next) {

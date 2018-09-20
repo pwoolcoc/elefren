@@ -99,7 +99,7 @@ impl<'a, H: HttpSend> Registration<'a, H> {
         self
     }
 
-    fn send(&self, req: &mut RequestBuilder) -> Result<Response> {
+    fn send(&self, req: RequestBuilder) -> Result<Response> {
         Ok(self.http_sender.send(&self.client, req)?)
     }
 
@@ -184,7 +184,7 @@ impl<'a, H: HttpSend> Registration<'a, H> {
 }
 
 impl<H: HttpSend> Registered<H> {
-    fn send(&self, req: &mut RequestBuilder) -> Result<Response> {
+    fn send(&self, req: RequestBuilder) -> Result<Response> {
         Ok(self.http_sender.send(&self.client, req)?)
     }
 
@@ -213,7 +213,7 @@ impl<H: HttpSend> Registered<H> {
             self.redirect
         );
 
-        let token: AccessToken = self.send(&mut self.client.post(&url))?.json()?;
+        let token: AccessToken = self.send(self.client.post(&url))?.json()?;
 
         let data = Data {
             base: self.base.into(),

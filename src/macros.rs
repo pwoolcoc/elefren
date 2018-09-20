@@ -5,7 +5,7 @@ macro_rules! methods {
             -> Result<T>
             {
                 let response = self.send(
-                        &mut self.client.$method(&url)
+                        self.client.$method(&url)
                 )?;
 
                 deserialise(response)
@@ -43,7 +43,7 @@ macro_rules! paged_routes {
             fn $name(&self) -> Result<Page<$ret, H>> {
                 let url = self.route(concat!("/api/v1/", $url));
                 let response = self.send(
-                        &mut self.client.$method(&url)
+                        self.client.$method(&url)
                 )?;
 
                 Page::new(self, response)
@@ -88,7 +88,7 @@ macro_rules! paged_routes {
                 let url = format!(concat!("/api/v1/", $url, "?{}"), &qs);
 
                 let response = self.send(
-                        &mut self.client.get(&url)
+                        self.client.get(&url)
                 )?;
 
                 Page::new(self, response)
@@ -350,7 +350,7 @@ macro_rules! paged_routes_with_id {
             fn $name(&self, id: &str) -> Result<Page<$ret, H>> {
                 let url = self.route(&format!(concat!("/api/v1/", $url), id));
                 let response = self.send(
-                        &mut self.client.$method(&url)
+                        self.client.$method(&url)
                 )?;
 
                 Page::new(self, response)

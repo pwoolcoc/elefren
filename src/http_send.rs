@@ -9,7 +9,7 @@ pub trait HttpSend: Clone + Debug {
 
     /// Convenience method so that .build() doesn't have to be called at every
     /// call site
-    fn send(&self, client: &Client, builder: &mut RequestBuilder) -> Result<Response> {
+    fn send(&self, client: &Client, builder: RequestBuilder) -> Result<Response> {
         let request = builder.build()?;
         self.execute(client, request)
     }

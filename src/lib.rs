@@ -46,6 +46,7 @@
 extern crate serde_derive;
 #[macro_use]
 extern crate doc_comment;
+extern crate hyper_old_types;
 extern crate isolang;
 #[macro_use]
 extern crate serde_json;
@@ -72,12 +73,7 @@ extern crate indoc;
 
 use std::{borrow::Cow, ops};
 
-use reqwest::{
-    header::{Authorization, Bearer, Headers},
-    Client,
-    RequestBuilder,
-    Response,
-};
+use reqwest::{Client, RequestBuilder, Response};
 use tap_reader::Tap;
 
 use entities::prelude::*;
@@ -139,7 +135,6 @@ pub mod prelude {
 pub struct Mastodon<H: HttpSend = HttpSender> {
     client: Client,
     http_sender: H,
-    headers: Headers,
     /// Raw data about your mastodon instance.
     pub data: Data,
 }
@@ -151,10 +146,10 @@ impl<H: HttpSend> Mastodon<H> {
         format!("{}{}", self.base, url)
     }
 
-    pub(crate) fn send(&self, req: &mut RequestBuilder) -> Result<Response> {
+    pub(crate) fn send(&self, req: RequestBuilder) -> Result<Response> {
         Ok(self
             .http_sender
-            .send(&self.client, req.headers(self.headers.clone()))?)
+            .send(&self.client, req.bearer_auth(&self.token))?)
     }
 }
 
@@ -361,7 +356,7 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
             url = format!("{}{}", url, request.to_querystring());
         }
 
-        let response = self.send(&mut self.client.get(&url))?;
+        let response = self.send(self.client.get(&url))?;
 
         Page::new(self, response)
     }
@@ -383,7 +378,7 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
             url.pop();
         }
 
-        let response = self.send(&mut self.client.get(&url))?;
+        let response = self.send(self.client.get(&url))?;
 
         Page::new(self, response)
     }
@@ -449,15 +444,9 @@ impl<H: HttpSend> MastodonBuilder<H> {
 
     pub fn build(self) -> Result<Mastodon<H>> {
         Ok(if let Some(data) = self.data {
-            let mut headers = Headers::new();
-            headers.set(Authorization(Bearer {
-                token: (*data.token).to_owned(),
-            }));
-
             Mastodon {
                 client: self.client.unwrap_or_else(|| Client::new()),
                 http_sender: self.http_sender,
-                headers,
                 data,
             }
         } else {

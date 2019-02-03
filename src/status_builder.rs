@@ -26,7 +26,7 @@ pub struct StatusBuilder {
     pub in_reply_to_id: Option<u64>,
     /// Ids of media attachments being attached to the status.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub media_ids: Option<Vec<u64>>,
+    pub media_ids: Option<Vec<String>>,
     /// Whether current status is sensitive.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sensitive: Option<bool>,

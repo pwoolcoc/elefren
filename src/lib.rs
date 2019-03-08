@@ -83,6 +83,7 @@ extern crate serde_json;
 extern crate chrono;
 extern crate reqwest;
 extern crate serde;
+extern crate serde_qs;
 extern crate serde_urlencoded;
 extern crate tap_reader;
 extern crate try_from;
@@ -389,7 +390,7 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
         let mut url = format!("{}/api/v1/accounts/{}/statuses", self.base, id);
 
         if let Some(request) = request.into() {
-            url = format!("{}{}", url, request.to_querystring());
+            url = format!("{}{}", url, request.to_querystring()?);
         }
 
         let response = self.send(self.client.get(&url))?;

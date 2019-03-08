@@ -5,6 +5,7 @@ use envy::Error as EnvyError;
 use hyper_old_types::Error as HeaderParseError;
 use reqwest::{header::ToStrError as HeaderStrError, Error as HttpError, StatusCode};
 use serde_json::Error as SerdeError;
+use serde_qs::Error as SerdeQsError;
 use serde_urlencoded::ser::Error as UrlEncodedError;
 #[cfg(feature = "toml")]
 use tomlcrate::de::Error as TomlDeError;
@@ -57,6 +58,8 @@ pub enum Error {
     #[cfg(feature = "env")]
     /// Error deserializing from the environment
     Envy(EnvyError),
+    /// Error serializing to a query string
+    SerdeQs(SerdeQsError),
     /// Other errors
     Other(String),
 }
@@ -96,6 +99,7 @@ impl error::Error for Error {
             Error::HeaderParseError(ref e) => e.description(),
             #[cfg(feature = "env")]
             Error::Envy(ref e) => e.description(),
+            Error::SerdeQs(ref e) => e.description(),
             Error::Other(ref e) => e,
         }
     }
@@ -136,6 +140,7 @@ from! {
     HeaderStrError, HeaderStrError,
     HeaderParseError, HeaderParseError,
     #[cfg(feature = "env")] EnvyError, Envy,
+    SerdeQsError, SerdeQs,
     String, Other,
 }
 

@@ -1,4 +1,22 @@
+use errors::Error;
+use serde_qs;
 use std::{borrow::Cow, convert::Into};
+
+mod bool_qs_serialize {
+    use serde::Serializer;
+
+    pub fn is_false(b: &bool) -> bool {
+        !*b
+    }
+
+    pub fn serialize<S: Serializer>(b: &bool, s: S) -> Result<S::Ok, S::Error> {
+        if *b {
+            s.serialize_i64(1)
+        } else {
+            s.serialize_i64(0)
+        }
+    }
+}
 
 /// Builder for making a client.statuses() call
 ///
@@ -9,16 +27,27 @@ use std::{borrow::Cow, convert::Into};
 /// # use elefren::StatusesRequest;
 /// let mut request = StatusesRequest::new();
 /// request.only_media().pinned().since_id("foo");
-/// # assert_eq!(&request.to_querystring()[..], "?only_media=1&pinned=1&since_id=foo");
+/// # assert_eq!(&request.to_querystring().expect("Couldn't serialize qs")[..], "?only_media=1&pinned=1&since_id=foo");
 /// ```
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize)]
 pub struct StatusesRequest<'a> {
+    #[serde(skip_serializing_if = "bool_qs_serialize::is_false")]
+    #[serde(serialize_with = "bool_qs_serialize::serialize")]
     only_media: bool,
+    #[serde(skip_serializing_if = "bool_qs_serialize::is_false")]
+    #[serde(serialize_with = "bool_qs_serialize::serialize")]
     exclude_replies: bool,
+    #[serde(skip_serializing_if = "bool_qs_serialize::is_false")]
+    #[serde(serialize_with = "bool_qs_serialize::serialize")]
     pinned: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
     max_id: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     since_id: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     limit: Option<usize>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    min_id: Option<Cow<'a, str>>,
 }
 
 impl<'a> Into<Option<StatusesRequest<'a>>> for &'a mut StatusesRequest<'a> {
@@ -30,6 +59,7 @@ impl<'a> Into<Option<StatusesRequest<'a>>> for &'a mut StatusesRequest<'a> {
             max_id: self.max_id.clone(),
             since_id: self.since_id.clone(),
             limit: self.limit.clone(),
+            min_id: self.min_id.clone(),
         })
     }
 }
@@ -56,7 +86,7 @@ impl<'a> StatusesRequest<'a> {
     /// # extern crate elefren;
     /// # use elefren::StatusesRequest;
     /// let mut request = StatusesRequest::new();
-    /// assert_eq!(&request.only_media().to_querystring(), "?only_media=1");
+    /// assert_eq!(&request.only_media().to_querystring().expect("Couldn't serialize qs"), "?only_media=1");
     pub fn only_media(&mut self) -> &mut Self {
         self.only_media = true;
         self
@@ -71,7 +101,10 @@ impl<'a> StatusesRequest<'a> {
     /// # use elefren::StatusesRequest;
     /// let mut request = StatusesRequest::new();
     /// assert_eq!(
-    ///     &request.exclude_replies().to_querystring(),
+    ///     &request
+    ///         .exclude_replies()
+    ///         .to_querystring()
+    ///         .expect("Couldn't serialize qs"),
     ///     "?exclude_replies=1"
     /// );
     /// ```
@@ -88,7 +121,13 @@ impl<'a> StatusesRequest<'a> {
     /// # extern crate elefren;
     /// # use elefren::StatusesRequest;
     /// let mut request = StatusesRequest::new();
-    /// assert_eq!(&request.pinned().to_querystring(), "?pinned=1");
+    /// assert_eq!(
+    ///     &request
+    ///         .pinned()
+    ///         .to_querystring()
+    ///         .expect("Couldn't serialize qs"),
+    ///     "?pinned=1"
+    /// );
     /// ```
     pub fn pinned(&mut self) -> &mut Self {
         self.pinned = true;
@@ -103,7 +142,13 @@ impl<'a> StatusesRequest<'a> {
     /// # extern crate elefren;
     /// # use elefren::StatusesRequest;
     /// let mut request = StatusesRequest::new();
-    /// assert_eq!(&request.max_id("foo").to_querystring(), "?max_id=foo");
+    /// assert_eq!(
+    ///     &request
+    ///         .max_id("foo")
+    ///         .to_querystring()
+    ///         .expect("Couldn't serialize qs"),
+    ///     "?max_id=foo"
+    /// );
     /// ```
     pub fn max_id<S: Into<Cow<'a, str>>>(&mut self, max_id: S) -> &mut Self {
         self.max_id = Some(max_id.into());
@@ -118,7 +163,13 @@ impl<'a> StatusesRequest<'a> {
     /// # extern crate elefren;
     /// # use elefren::StatusesRequest;
     /// let mut request = StatusesRequest::new();
-    /// assert_eq!(&request.since_id("foo").to_querystring(), "?since_id=foo");
+    /// assert_eq!(
+    ///     &request
+    ///         .since_id("foo")
+    ///         .to_querystring()
+    ///         .expect("Couldn't serialize qs"),
+    ///     "?since_id=foo"
+    /// );
     /// ```
     pub fn since_id<S: Into<Cow<'a, str>>>(&mut self, since_id: S) -> &mut Self {
         self.since_id = Some(since_id.into());
@@ -133,10 +184,37 @@ impl<'a> StatusesRequest<'a> {
     /// # extern crate elefren;
     /// # use elefren::StatusesRequest;
     /// let mut request = StatusesRequest::new();
-    /// assert_eq!(&request.limit(10).to_querystring(), "?limit=10");
+    /// assert_eq!(
+    ///     &request
+    ///         .limit(10)
+    ///         .to_querystring()
+    ///         .expect("Couldn't serialize qs"),
+    ///     "?limit=10"
+    /// );
     /// ```
     pub fn limit(&mut self, limit: usize) -> &mut Self {
         self.limit = Some(limit);
+        self
+    }
+
+    /// Set the `?min_id=:min_id` flag for the .statuses() request
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # extern crate elefren;
+    /// # use elefren::StatusesRequest;
+    /// let mut request = StatusesRequest::new();
+    /// assert_eq!(
+    ///     &request
+    ///         .min_id("foobar")
+    ///         .to_querystring()
+    ///         .expect("Couldn't serialize qs"),
+    ///     "?min_id=foobar"
+    /// );
+    /// ```
+    pub fn min_id<S: Into<Cow<'a, str>>>(&mut self, min_id: S) -> &mut Self {
+        self.min_id = Some(min_id.into());
         self
     }
 
@@ -149,42 +227,16 @@ impl<'a> StatusesRequest<'a> {
     /// # use elefren::StatusesRequest;
     /// let mut request = StatusesRequest::new();
     /// assert_eq!(
-    ///     &request.limit(10).pinned().to_querystring(),
+    ///     &request
+    ///         .limit(10)
+    ///         .pinned()
+    ///         .to_querystring()
+    ///         .expect("Couldn't serialize qs"),
     ///     "?pinned=1&limit=10"
     /// );
     /// ```
-    pub fn to_querystring(&self) -> String {
-        let mut opts = vec![];
-
-        if self.only_media {
-            opts.push("only_media=1".into());
-        }
-
-        if self.exclude_replies {
-            opts.push("exclude_replies=1".into());
-        }
-
-        if self.pinned {
-            opts.push("pinned=1".into());
-        }
-
-        if let Some(ref max_id) = self.max_id {
-            opts.push(format!("max_id={}", max_id));
-        }
-
-        if let Some(ref since_id) = self.since_id {
-            opts.push(format!("since_id={}", since_id));
-        }
-
-        if let Some(limit) = self.limit {
-            opts.push(format!("limit={}", limit));
-        }
-
-        if opts.is_empty() {
-            String::new()
-        } else {
-            format!("?{}", opts.join("&"))
-        }
+    pub fn to_querystring(&self) -> Result<String, Error> {
+        Ok(format!("?{}", serde_qs::to_string(&self)?))
     }
 }
 
@@ -204,6 +256,7 @@ mod tests {
                 max_id: None,
                 since_id: None,
                 limit: None,
+                min_id: None,
             }
         );
     }
@@ -221,6 +274,7 @@ mod tests {
                 max_id: None,
                 since_id: None,
                 limit: None,
+                min_id: None,
             }
         );
     }
@@ -238,6 +292,7 @@ mod tests {
                 max_id: None,
                 since_id: None,
                 limit: None,
+                min_id: None,
             }
         );
     }
@@ -254,6 +309,7 @@ mod tests {
                 max_id: None,
                 since_id: None,
                 limit: None,
+                min_id: None,
             }
         );
     }
@@ -270,6 +326,7 @@ mod tests {
                 max_id: Some("foo".into()),
                 since_id: None,
                 limit: None,
+                min_id: None,
             }
         );
     }
@@ -286,6 +343,7 @@ mod tests {
                 max_id: None,
                 since_id: Some("foo".into()),
                 limit: None,
+                min_id: None,
             }
         );
     }
@@ -302,6 +360,24 @@ mod tests {
                 max_id: None,
                 since_id: None,
                 limit: Some(42),
+                min_id: None,
+            }
+        );
+    }
+    #[test]
+    fn test_min_id() {
+        let mut request = StatusesRequest::new();
+        request.min_id("foo");
+        assert_eq!(
+            request,
+            StatusesRequest {
+                only_media: false,
+                exclude_replies: false,
+                pinned: false,
+                max_id: None,
+                since_id: None,
+                limit: None,
+                min_id: Some("foo".into()),
             }
         );
     }
@@ -312,7 +388,7 @@ mod tests {
                 {
                     let mut $r = StatusesRequest::new();
                     $b
-                    let qs = $r.to_querystring();
+                    let qs = $r.to_querystring().expect("Failed to serialize querystring");
                     assert_eq!(&qs, $expected);
                 }
             }

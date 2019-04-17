@@ -10,7 +10,7 @@ keywords = ["api", "web", "social", "mastodon", "wrapper"]
 categories = ["web-programming", "web-programming::http-client", "api-bindings"]
 
 [dependencies]
-doc-comment = "0.2"
+doc-comment = "0.3"
 isolang = { version = "1.0", features = ["serde_serialize"] }
 reqwest = "0.9"
 serde = "1"

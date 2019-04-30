@@ -70,10 +70,10 @@ impl MetadataField {
 /// An extra object given from `verify_credentials` giving defaults about a user
 #[derive(Debug, Clone, Deserialize, PartialEq)]
 pub struct Source {
-    privacy: status_builder::Visibility,
+    privacy: Option<status_builder::Visibility>,
     #[serde(deserialize_with = "string_or_bool")]
     sensitive: bool,
-    note: String,
+    note: Option<String>,
     fields: Option<Vec<MetadataField>>,
 }
 

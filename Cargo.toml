@@ -12,7 +12,7 @@ categories = ["web-programming", "web-programming::http-client", "api-bindings"]
 [dependencies]
 doc-comment = "0.3"
 isolang = { version = "1.0", features = ["serde_serialize"] }
-reqwest = "0.9"
+reqwest = { version = "0.9", default-features = false }
 serde = "1"
 serde_derive = "1"
 serde_json = "1"
@@ -31,10 +31,11 @@ version = "0.4"
 features = ["serde"]
 
 [features]
-default = []
+default = ["reqwest/default-tls"]
 json = []
 env = ["envy"]
 all = ["toml", "json", "env"]
+rustls-tls = ["reqwest/rustls-tls"]
 
 [build-dependencies]
 skeptic = "0.13.3"

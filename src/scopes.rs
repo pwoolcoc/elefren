@@ -9,6 +9,8 @@ use std::{
 use serde::ser::{Serialize, Serializer};
 
 use errors::Error;
+use serde::{Deserialize, Deserializer};
+use serde::de::{self, Visitor};
 
 /// Represents a set of OAuth scopes
 ///
@@ -49,6 +51,29 @@ impl Serialize for Scopes {
     {
         let repr = format!("{}", self);
         serializer.serialize_str(&repr)
+    }
+}
+
+struct DeserializeScopesVisitor;
+
+impl<'de> Visitor<'de> for DeserializeScopesVisitor {
+    type Value = Scopes;
+
+    fn expecting(&self, formatter: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        write!(formatter, "space separated scopes")
+    }
+
+    fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
+        where E: de::Error
+    {
+        Scopes::from_str(v).map_err(de::Error::custom)
+    }
+}
+
+impl<'de> Deserialize<'de> for Scopes {
+    fn deserialize<D>(deserializer: D) -> Result<Self, <D as Deserializer<'de>>::Error> where
+        D: Deserializer<'de> {
+        deserializer.deserialize_str(DeserializeScopesVisitor)
     }
 }
 
@@ -725,7 +750,7 @@ mod tests {
     }
 
     #[test]
-    fn test_scopes_serialize() {
+    fn test_scopes_serialize_deserialize() {
         let tests = [
             (
                 Scopes::read_all() | Scopes::write(Write::Notifications) | Scopes::follow(),
@@ -738,6 +763,9 @@ mod tests {
             let ser = serde_json::to_string(&a).expect("Couldn't serialize Scopes");
             let expected = format!("\"{}\"", b);
             assert_eq!(&ser, &expected);
+
+            let des : Scopes = serde_json::from_str(&ser).expect("Couldn't deserialize Scopes");
+            assert_eq!(&des, a);
         }
     }
 

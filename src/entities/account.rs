@@ -54,8 +54,8 @@ pub struct Account {
 /// A single name: value pair from a user's profile
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
 pub struct MetadataField {
-    name: String,
-    value: String,
+    pub name: String,
+    pub value: String,
 }
 
 impl MetadataField {

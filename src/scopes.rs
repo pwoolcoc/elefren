@@ -692,7 +692,7 @@ mod tests {
             "push".to_string(),
         ];
 
-        let tests = values.into_iter().zip(expecteds.into_iter());
+        let tests = values.iter().zip(expecteds.iter());
 
         for (value, expected) in tests {
             let result = value.to_string();

@@ -1,6 +1,6 @@
 //! # Elefren: API Wrapper around the Mastodon API.
 //!
-//! Most of the api is documented on [Mastodon's website](https://docs.joinmastodon.org/api/)
+//! Most of the api is documented on [Mastodon's website](https://docs.joinmastodon.org/client/intro/)
 //!
 //! ```no_run
 //! # extern crate elefren;

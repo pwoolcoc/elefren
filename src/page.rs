@@ -3,7 +3,7 @@ use entities::itemsiter::ItemsIter;
 use hyper_old_types::header::{parsing, Link, RelationType};
 use reqwest::{header::LINK, Response};
 use serde::Deserialize;
-use url::Url;
+use reqwest::Url;
 
 use http_send::HttpSend;
 

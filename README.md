@@ -33,6 +33,8 @@ elefren = { version = "0.20", features = ["toml"] }
 
 ```rust,no_run
 // src/main.rs
+extern crate elefren;
+
 use std::error::Error;
 
 use elefren::prelude::*;

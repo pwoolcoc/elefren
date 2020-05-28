@@ -12,7 +12,6 @@ use tomlcrate::de::Error as TomlDeError;
 #[cfg(feature = "toml")]
 use tomlcrate::ser::Error as TomlSerError;
 use url::ParseError as UrlError;
-use url1x::ParseError as ReqwestUrlError;
 use tungstenite::error::Error as WebSocketError;
 
 /// Convience type over `std::result::Result` with `Error` as the error type.
@@ -35,8 +34,6 @@ pub enum Error {
     Io(IoError),
     /// Wrapper around the `url::ParseError` struct.
     Url(UrlError),
-    /// Wrapper around the `url::ParseError` struct.
-    ReqwestUrl(ReqwestUrlError),
     /// Missing Client Id.
     ClientIdRequired,
     /// Missing Client Secret.
@@ -85,7 +82,6 @@ impl error::Error for Error {
             Error::Http(ref e) => e,
             Error::Io(ref e) => e,
             Error::Url(ref e) => e,
-            Error::ReqwestUrl(ref e) => e,
             #[cfg(feature = "toml")]
             Error::TomlSer(ref e) => e,
             #[cfg(feature = "toml")]
@@ -146,7 +142,6 @@ from! {
     SerdeError, Serde,
     UrlEncodedError, UrlEncoded,
     UrlError, Url,
-    ReqwestUrlError, ReqwestUrl,
     ApiError, Api,
     #[cfg(feature = "toml")] TomlSerError, TomlSer,
     #[cfg(feature = "toml")] TomlDeError, TomlDe,

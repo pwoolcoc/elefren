@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use reqwest::{Client, RequestBuilder, Response};
 use try_from::TryInto;
-use url1x::percent_encoding::{utf8_percent_encode, DEFAULT_ENCODE_SET};
+use url::percent_encoding::{utf8_percent_encode, DEFAULT_ENCODE_SET};
 
 use apps::{App, AppBuilder};
 use http_send::{HttpSend, HttpSender};

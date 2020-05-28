@@ -89,7 +89,6 @@ extern crate serde_urlencoded;
 extern crate tap_reader;
 extern crate try_from;
 extern crate url;
-extern crate url1x;
 extern crate tungstenite;
 
 #[cfg(feature = "env")]
@@ -776,7 +775,7 @@ impl<H: HttpSend> MastodonBuilder<H> {
 pub struct MastodonUnauth<H: HttpSend = HttpSender> {
     client: Client,
     http_sender: H,
-    base: reqwest::Url,
+    base: url::Url,
 }
 
 impl MastodonUnauth<HttpSender> {
@@ -790,13 +789,13 @@ impl MastodonUnauth<HttpSender> {
         Ok(MastodonUnauth {
             client: Client::new(),
             http_sender: HttpSender,
-            base: reqwest::Url::parse(&base)?,
+            base: url::Url::parse(&base)?,
         })
     }
 }
 
 impl<H: HttpSend> MastodonUnauth<H> {
-    fn route(&self, url: &str) -> Result<reqwest::Url> {
+    fn route(&self, url: &str) -> Result<url::Url> {
         Ok(self.base.join(url)?)
     }
 

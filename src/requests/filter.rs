@@ -1,4 +1,4 @@
-use entities::filter::FilterContext;
+use crate::entities::filter::FilterContext;
 use std::time::Duration;
 
 /// Form used to create a filter

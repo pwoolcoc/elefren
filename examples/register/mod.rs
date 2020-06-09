@@ -11,14 +11,14 @@ use elefren::helpers::toml;
 
 #[allow(dead_code)]
 #[cfg(feature = "toml")]
-fn main() -> Result<(), Box<Error>> {
+fn main() -> Result<(), Box<dyn Error>> {
     register()?;
     Ok(())
 }
 
 #[allow(dead_code)]
 #[cfg(feature = "toml")]
-pub fn get_mastodon_data() -> Result<Mastodon, Box<Error>> {
+pub fn get_mastodon_data() -> Result<Mastodon, Box<dyn Error>> {
     if let Ok(data) = toml::from_file("mastodon-data.toml") {
         Ok(Mastodon::from(data))
     } else {
@@ -27,7 +27,7 @@ pub fn get_mastodon_data() -> Result<Mastodon, Box<Error>> {
 }
 
 #[cfg(feature = "toml")]
-pub fn register() -> Result<Mastodon, Box<Error>> {
+pub fn register() -> Result<Mastodon, Box<dyn Error>> {
     let website = read_line("Please enter your mastodon instance url:")?;
     let registration = Registration::new(website.trim())
         .client_name("elefren-examples")
@@ -43,7 +43,7 @@ pub fn register() -> Result<Mastodon, Box<Error>> {
 }
 
 #[cfg(feature = "toml")]
-pub fn read_line(message: &str) -> Result<String, Box<Error>> {
+pub fn read_line(message: &str) -> Result<String, Box<dyn Error>> {
     println!("{}", message);
 
     let mut input = String::new();

@@ -1,17 +1,17 @@
 use std::borrow::Cow;
 
-use entities::prelude::*;
-use errors::Result;
-use http_send::{HttpSend, HttpSender};
-use page::Page;
-use requests::{
+use crate::entities::prelude::*;
+use crate::errors::Result;
+use crate::http_send::{HttpSend, HttpSender};
+use crate::page::Page;
+use crate::requests::{
     AddFilterRequest,
     AddPushRequest,
     StatusesRequest,
     UpdateCredsRequest,
     UpdatePushRequest,
 };
-use status_builder::NewStatus;
+use crate::status_builder::NewStatus;
 
 /// Represents the set of methods that a Mastodon Client can do, so that
 /// implementations might be swapped out for testing

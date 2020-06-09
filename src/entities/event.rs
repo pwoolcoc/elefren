@@ -1,4 +1,4 @@
-use entities::{notification::Notification, status::Status};
+use crate::entities::{notification::Notification, status::Status};
 
 #[derive(Debug, Clone)]
 /// Events that come from the /streaming/user API call

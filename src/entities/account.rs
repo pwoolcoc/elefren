@@ -2,7 +2,7 @@
 
 use chrono::prelude::*;
 use serde::de::{self, Deserialize, Deserializer, Unexpected};
-use status_builder;
+use crate::status_builder;
 use std::path::PathBuf;
 
 /// A struct representing an Account.

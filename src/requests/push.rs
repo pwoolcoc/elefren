@@ -1,5 +1,5 @@
-use entities::push::{add_subscription, update_data};
-use errors::Result;
+use crate::entities::push::{add_subscription, update_data};
+use crate::errors::Result;
 
 /// Container for the key & auth strings for an AddPushRequest
 ///
@@ -169,7 +169,7 @@ impl AddPushRequest {
     }
 
     pub(crate) fn build(&self) -> Result<add_subscription::Form> {
-        use entities::push::{
+        use crate::entities::push::{
             add_subscription::{Data, Form, Keys, Subscription},
             Alerts,
         };
@@ -326,7 +326,7 @@ impl UpdatePushRequest {
     }
 
     pub(crate) fn build(&self) -> update_data::Form {
-        use entities::push::{
+        use crate::entities::push::{
             update_data::{Data, Form},
             Alerts,
         };
@@ -361,7 +361,7 @@ impl UpdatePushRequest {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use entities::push::{add_subscription, update_data, Alerts};
+    use crate::entities::push::{add_subscription, update_data, Alerts};
 
     #[test]
     fn test_keys_new() {

@@ -5,9 +5,9 @@
 //! ```no_run
 //! # extern crate elefren;
 //! # fn main() {
-//! #    try().unwrap();
+//! #    run().unwrap();
 //! # }
-//! # fn try() -> elefren::Result<()> {
+//! # fn run() -> elefren::Result<()> {
 //! use elefren::{helpers::cli, prelude::*};
 //!
 //! let registration = Registration::new("https://mastodon.social")
@@ -114,23 +114,23 @@ use reqwest::{Client, RequestBuilder, Response};
 use tap_reader::Tap;
 use tungstenite::client::AutoStream;
 
-use entities::prelude::*;
-use http_send::{HttpSend, HttpSender};
-use page::Page;
+use crate::entities::prelude::*;
+use crate::http_send::{HttpSend, HttpSender};
+use crate::page::Page;
 
-pub use data::Data;
-pub use errors::{ApiError, Error, Result};
+pub use crate::data::Data;
+pub use crate::errors::{ApiError, Error, Result};
 pub use isolang::Language;
-pub use mastodon_client::{MastodonClient, MastodonUnauthenticated};
-pub use registration::Registration;
-pub use requests::{
+pub use crate::mastodon_client::{MastodonClient, MastodonUnauthenticated};
+pub use crate::registration::Registration;
+pub use crate::requests::{
     AddFilterRequest,
     AddPushRequest,
     StatusesRequest,
     UpdateCredsRequest,
     UpdatePushRequest,
 };
-pub use status_builder::{NewStatus, StatusBuilder};
+pub use crate::status_builder::{NewStatus, StatusBuilder};
 
 /// Registering your App
 pub mod apps;
@@ -159,14 +159,14 @@ pub mod status_builder;
 mod macros;
 /// Automatically import the things you need
 pub mod prelude {
-    pub use scopes::Scopes;
-    pub use Data;
-    pub use Mastodon;
-    pub use MastodonClient;
-    pub use NewStatus;
-    pub use Registration;
-    pub use StatusBuilder;
-    pub use StatusesRequest;
+    pub use crate::scopes::Scopes;
+    pub use crate::Data;
+    pub use crate::Mastodon;
+    pub use crate::MastodonClient;
+    pub use crate::NewStatus;
+    pub use crate::Registration;
+    pub use crate::StatusBuilder;
+    pub use crate::StatusesRequest;
 }
 
 /// Your mastodon application client, handles all requests to and from Mastodon.

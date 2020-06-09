@@ -2,8 +2,8 @@
 
 use super::prelude::*;
 use chrono::prelude::*;
-use entities::card::Card;
-use status_builder::Visibility;
+use crate::entities::card::Card;
+use crate::status_builder::Visibility;
 
 /// A status from the instance.
 #[derive(Debug, Clone, Deserialize, PartialEq)]

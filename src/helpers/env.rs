@@ -1,7 +1,7 @@
 use envy;
 
-use data::Data;
-use Result;
+use crate::data::Data;
+use crate::Result;
 
 /// Attempts to deserialize a Data struct from the environment
 pub fn from_env() -> Result<Data> {

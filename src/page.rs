@@ -1,11 +1,11 @@
 use super::{deserialise, Mastodon, Result};
-use entities::itemsiter::ItemsIter;
+use crate::entities::itemsiter::ItemsIter;
 use hyper_old_types::header::{parsing, Link, RelationType};
 use reqwest::{header::LINK, Response};
 use serde::Deserialize;
 use url::Url;
 
-use http_send::HttpSend;
+use crate::http_send::HttpSend;
 
 macro_rules! pages {
     ($($direction:ident: $fun:ident),*) => {

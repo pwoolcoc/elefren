@@ -5,11 +5,11 @@ extern crate pretty_env_logger;
 extern crate elefren;
 mod register;
 
-use register::MastodonClient;
+use crate::register::MastodonClient;
 use std::error;
 
 #[cfg(feature = "toml")]
-fn main() -> Result<(), Box<error::Error>> {
+fn main() -> Result<(), Box<dyn error::Error>> {
     let mastodon = register::get_mastodon_data()?;
     let input = register::read_line("Enter the path to the photo you'd like to post: ")?;
 

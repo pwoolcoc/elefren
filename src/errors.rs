@@ -8,9 +8,9 @@ use serde_json::Error as SerdeError;
 use serde_qs::Error as SerdeQsError;
 use serde_urlencoded::ser::Error as UrlEncodedError;
 #[cfg(feature = "toml")]
-use tomlcrate::de::Error as TomlDeError;
+use crate::tomlcrate::de::Error as TomlDeError;
 #[cfg(feature = "toml")]
-use tomlcrate::ser::Error as TomlSerError;
+use crate::tomlcrate::ser::Error as TomlSerError;
 use url::ParseError as UrlError;
 use tungstenite::error::Error as WebSocketError;
 
@@ -128,7 +128,7 @@ macro_rules! from {
             $(#[$met])*
             impl From<$typ> for Error {
                 fn from(from: $typ) -> Self {
-                    use Error::*;
+                    use crate::Error::*;
                     $variant(from)
                 }
             }
@@ -237,7 +237,7 @@ mod tests {
     #[cfg(feature = "toml")]
     #[test]
     fn from_toml_de_error() {
-        use tomlcrate;
+        use crate::tomlcrate;
         let err: TomlDeError = tomlcrate::from_str::<()>("not valid toml").unwrap_err();
         let err: Error = Error::from(err);
         assert_is!(err, Error::TomlDe(..));

@@ -2,8 +2,8 @@ use std::borrow::Cow;
 
 use try_from::TryInto;
 
-use errors::{Error, Result};
-use scopes::Scopes;
+use crate::errors::{Error, Result};
+use crate::scopes::Scopes;
 
 /// Represents an application that can be registered with a mastodon instance
 #[derive(Clone, Debug, Default, Serialize, PartialEq)]

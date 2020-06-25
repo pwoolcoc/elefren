@@ -196,12 +196,16 @@ pub trait MastodonClient<H: HttpSend = HttpSender> {
     fn new_status(&self, status: NewStatus) -> Result<Status> {
         unimplemented!("This method was not implemented");
     }
-    /// GET /api/v1/timelines/public
-    fn get_public_timeline(&self, local: bool) -> Result<Vec<Status>> {
+/// GET /api/v1/timelines/public?local=true
+    fn get_local_timeline(&self) -> Result<Page<Status, H>> {
+        unimplemented!("This method was not implemented");
+    }
+/// GET /api/v1/timelines/public?local=false
+    fn get_federated_timeline(&self) -> Result<Page<Status, H>> {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/timelines/tag/:hashtag
-    fn get_tagged_timeline(&self, hashtag: String, local: bool) -> Result<Vec<Status>> {
+    fn get_hashtag_timeline(&self, hashtag: &str, local: bool) -> Result<Page<Status, H>> {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/accounts/:id/statuses

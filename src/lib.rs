@@ -212,6 +212,8 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
         (get) domain_blocks: "domain_blocks" => String,
         (get) follow_requests: "follow_requests" => Account,
         (get) get_home_timeline: "timelines/home" => Status,
+        (get) get_local_timeline: "timelines/public?local=true" => Status,
+        (get) get_federated_timeline: "timelines/public?local=false" => Status,
         (get) get_emojis: "custom_emojis" => Emoji,
         (get) mutes: "mutes" => Account,
         (get) notifications: "notifications" => Notification,
@@ -236,7 +238,6 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
         (post (id: &str,)) authorize_follow_request: "accounts/follow_requests/authorize" => Empty,
         (post (id: &str,)) reject_follow_request: "accounts/follow_requests/reject" => Empty,
         (get  (q: &'a str, resolve: bool,)) search: "search" => SearchResult,
-        (get  (local: bool,)) get_public_timeline: "timelines/public" => Vec<Status>,
         (post (uri: Cow<'static, str>,)) follows: "follows" => Account,
         (post multipart (file: Cow<'static, str>,)) media: "media" => Attachment,
         (post) clear_notifications: "notifications/clear" => Empty,
@@ -335,7 +336,7 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
 
     /// Get timeline filtered by a hashtag(eg. `#coffee`) either locally or
     /// federated.
-    fn get_tagged_timeline(&self, hashtag: String, local: bool) -> Result<Vec<Status>> {
+    fn get_hashtag_timeline(&self, hashtag: &str, local: bool) -> Result<Page<Status, H>> {
         let base = "/api/v1/timelines/tag/";
         let url = if local {
             self.route(&format!("{}{}?local=1", base, hashtag))
@@ -343,7 +344,7 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
             self.route(&format!("{}{}", base, hashtag))
         };
 
-        self.get(url)
+        Page::new(self, self.send(self.client.get(&url))?)
     }
 
     /// Get statuses of a single account by id. Optionally only with pictures

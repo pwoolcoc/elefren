@@ -3,6 +3,7 @@ use std::borrow::Cow;
 use crate::entities::prelude::*;
 use crate::errors::Result;
 use crate::http_send::{HttpSend, HttpSender};
+use crate::media_builder::MediaBuilder;
 use crate::page::Page;
 use crate::requests::{
     AddFilterRequest,
@@ -113,7 +114,7 @@ pub trait MastodonClient<H: HttpSend = HttpSender> {
         unimplemented!("This method was not implemented");
     }
     /// POST /api/v1/media
-    fn media(&self, file: Cow<'static, str>) -> Result<Attachment> {
+    fn media(&self, media_builder: MediaBuilder) -> Result<Attachment> {
         unimplemented!("This method was not implemented");
     }
     /// POST /api/v1/notifications/clear

@@ -144,41 +144,6 @@ macro_rules! route_v2 {
 
 macro_rules! route {
 
-    ((post multipart ($($param:ident: $typ:ty,)*)) $name:ident: $url:expr => $ret:ty, $($rest:tt)*) => {
-        doc_comment! {
-            concat!(
-                "Equivalent to `post /api/v1/",
-                $url,
-                "`\n# Errors\nIf `access_token` is not set."),
-            fn $name(&self, $($param: $typ,)*) -> Result<$ret> {
-                use reqwest::multipart::Form;
-
-                let form_data = Form::new()
-                    $(
-                        .file(stringify!($param), $param.as_ref())?
-                     )*;
-
-                let response = self.send(
-                        self.client
-                            .post(&self.route(concat!("/api/v1/", $url)))
-                            .multipart(form_data)
-                )?;
-
-                let status = response.status().clone();
-
-                if status.is_client_error() {
-                    return Err(Error::Client(status));
-                } else if status.is_server_error() {
-                    return Err(Error::Server(status));
-                }
-
-                deserialise(response)
-            }
-        }
-
-        route!{$($rest)*}
-    };
-
     ((get ($($param:ident: $typ:ty,)*)) $name:ident: $url:expr => $ret:ty, $($rest:tt)*) => {
         doc_comment! {
             concat!(

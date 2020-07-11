@@ -122,6 +122,7 @@ pub use crate::data::Data;
 pub use crate::errors::{ApiError, Error, Result};
 pub use isolang::Language;
 pub use crate::mastodon_client::{MastodonClient, MastodonUnauthenticated};
+pub use crate::media_builder::MediaBuilder;
 pub use crate::registration::Registration;
 pub use crate::requests::{
     AddFilterRequest,
@@ -145,6 +146,8 @@ pub mod helpers;
 /// Contains trait for converting `reqwest::Request`s to `reqwest::Response`s
 pub mod http_send;
 mod mastodon_client;
+/// Constructing media attachments for a status.
+pub mod media_builder;
 /// Handling multiple pages of entities.
 pub mod page;
 /// Registering your app.
@@ -238,7 +241,6 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
         (get  (q: &'a str, resolve: bool,)) search: "search" => SearchResult,
         (get  (local: bool,)) get_public_timeline: "timelines/public" => Vec<Status>,
         (post (uri: Cow<'static, str>,)) follows: "follows" => Account,
-        (post multipart (file: Cow<'static, str>,)) media: "media" => Attachment,
         (post) clear_notifications: "notifications/clear" => Empty,
         (post (id: &str,)) dismiss_notification: "notifications/dismiss" => Empty,
         (get) get_push_subscription: "push/subscription" => Subscription,
@@ -625,6 +627,38 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
         let client = tungstenite::connect(url.as_str())?.0;
 
         Ok(EventReader(WebSocket(client)))
+    }
+
+    /// Equivalent to /api/v1/media
+    fn media(&self, media_builder: MediaBuilder) -> Result<Attachment> {
+        use reqwest::multipart::Form;
+
+        let mut form_data = Form::new().file("file", media_builder.file.as_ref())?;
+
+        if let Some(description) = media_builder.description {
+            form_data = form_data.text("description", description);
+        }
+
+        if let Some(focus) = media_builder.focus {
+            let string = format!("{},{}", focus.0, focus.1);
+            form_data = form_data.text("focus", string);
+        }
+
+        let response = self.send(
+            self.client
+                .post(&self.route("/api/v1/media"))
+                .multipart(form_data),
+        )?;
+
+        let status = response.status().clone();
+
+        if status.is_client_error() {
+            return Err(Error::Client(status));
+        } else if status.is_server_error() {
+            return Err(Error::Server(status));
+        }
+
+        deserialise(response)
     }
 }
 

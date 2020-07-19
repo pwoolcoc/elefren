@@ -802,6 +802,23 @@ impl<H: HttpSend> MastodonUnauth<H> {
     fn send(&self, req: RequestBuilder) -> Result<Response> {
         Ok(self.http_sender.send(&self.client, req)?)
     }
+
+    /// Get a stream of the public timeline
+    pub fn streaming_public(&self) -> Result<EventReader<WebSocket>> {
+        let mut url: url::Url = self.route("/api/v1/streaming/public/local")?;
+        url.query_pairs_mut().append_pair("stream", "public");
+        let mut url: url::Url = reqwest::get(url.as_str())?.url().as_str().parse()?;
+        let new_scheme = match url.scheme() {
+            "http" => "ws",
+            "https" => "wss",
+            x => return Err(Error::Other(format!("Bad URL scheme: {}", x))),
+        };
+        url.set_scheme(new_scheme).map_err(|_| Error::Other("Bad URL scheme!".to_string()))?;
+
+        let client = tungstenite::connect(url.as_str())?.0;
+
+        Ok(EventReader(WebSocket(client)))
+    }
 }
 
 impl<H: HttpSend> MastodonUnauthenticated<H> for MastodonUnauth<H> {

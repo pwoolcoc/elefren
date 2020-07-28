@@ -45,7 +45,7 @@ skeptic = "0.13.3"
 [dev-dependencies]
 skeptic = "0.13.3"
 tempfile = "3.0.3"
-indoc = "0.3.1"
+indoc = "1.0.2"
 pretty_env_logger = "0.4.0"
 
 [package.metadata.docs.rs]

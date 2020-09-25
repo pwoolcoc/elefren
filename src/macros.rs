@@ -79,7 +79,7 @@ macro_rules! paged_routes {
 
                 let qs_data = Data {
                     $(
-                            $param: $param,
+                            $param,
                     )*
                     _marker: ::std::marker::PhantomData,
                 };
@@ -125,7 +125,7 @@ macro_rules! route_v2 {
 
                 let qs_data = Data {
                     $(
-                            $param: $param,
+                            $param,
                     )*
                     _marker: ::std::marker::PhantomData,
                 };
@@ -168,7 +168,7 @@ macro_rules! route {
 
                 let qs_data = Data {
                     $(
-                            $param: $param,
+                            $param,
                     )*
                     _marker: ::std::marker::PhantomData,
                 };

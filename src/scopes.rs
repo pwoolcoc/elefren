@@ -217,8 +217,7 @@ impl Scopes {
         let newset: HashSet<_> = self
             .scopes
             .union(&other.scopes)
-            .into_iter()
-            .map(|s| *s)
+            .copied()
             .collect();
         Scopes {
             scopes: newset,

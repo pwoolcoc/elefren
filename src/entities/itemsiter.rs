@@ -81,10 +81,8 @@ impl<'a, T: Clone + for<'de> Deserialize<'de>, H: HttpSend> Iterator for ItemsIt
             }
             Some(self.page.initial_items[idx].clone())
         } else {
-            if self.need_next_page() {
-                if self.fill_next_page().is_none() {
-                    return None;
-                }
+            if self.need_next_page() && self.fill_next_page().is_none() {
+                return None;
             }
             let idx = self.cur_idx;
             self.cur_idx += 1;

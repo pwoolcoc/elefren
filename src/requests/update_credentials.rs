@@ -193,8 +193,8 @@ impl UpdateCredsRequest {
             avatar: self.avatar.clone(),
             header: self.avatar.clone(),
             source: Some(UpdateSource {
-                privacy: self.privacy.clone(),
-                sensitive: self.sensitive.clone(),
+                privacy: self.privacy,
+                sensitive: self.sensitive,
             }),
             fields_attributes: self.field_attributes.clone(),
         })

@@ -59,7 +59,7 @@ macro_rules! pages {
 ///     page: RefCell<Option<OwnedPage<Status, HttpSender>>>,
 /// }
 /// let client = Mastodon::from(data);
-/// let home = client.get_home_timeline()?.to_owned();
+/// let home = client.get_home_timeline()?.into_owned();
 /// let tl = HomeTimeline {
 ///     client,
 ///     page: RefCell::new(Some(home)),
@@ -148,7 +148,7 @@ impl<'a, T: Clone + for<'de> Deserialize<'de>, H: HttpSend> Page<'a, T, H> {
     ///     page: RefCell<Option<OwnedPage<Status, HttpSender>>>,
     /// }
     /// let client = Mastodon::from(data);
-    /// let home = client.get_home_timeline()?.to_owned();
+    /// let home = client.get_home_timeline()?.into_owned();
     /// let tl = HomeTimeline {
     ///     client,
     ///     page: RefCell::new(Some(home)),
@@ -156,7 +156,7 @@ impl<'a, T: Clone + for<'de> Deserialize<'de>, H: HttpSend> Page<'a, T, H> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn to_owned(self) -> OwnedPage<T, H> {
+    pub fn into_owned(self) -> OwnedPage<T, H> {
         OwnedPage::from(self)
     }
 

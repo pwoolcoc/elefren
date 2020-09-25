@@ -16,7 +16,7 @@ use crate::{
     Result,
 };
 
-const DEFAULT_REDIRECT_URI: &'static str = "urn:ietf:wg:oauth:2.0:oob";
+const DEFAULT_REDIRECT_URI: &str = "urn:ietf:wg:oauth:2.0:oob";
 
 /// Handles registering your mastodon app to your instance. It is recommended
 /// you cache your data struct to avoid registering on every run.

@@ -1,5 +1,3 @@
-use envy;
-
 use crate::{data::Data, Result};
 
 /// Attempts to deserialize a Data struct from the environment

@@ -1,6 +1,7 @@
 use crate::entities::{notification::Notification, status::Status};
 
 #[derive(Debug, Clone)]
+#[allow(clippy::large_enum_variant)]
 /// Events that come from the /streaming/user API call
 pub enum Event {
     /// Update event

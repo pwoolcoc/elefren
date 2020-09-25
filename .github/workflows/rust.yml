@@ -38,7 +38,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: fmt
-          args: --features all --all -- --check
+          args: --verbose --all -- --check
       - uses: actions-rs/cargo@v1
         with:
           command: clippy

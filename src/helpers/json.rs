@@ -4,8 +4,6 @@ use std::{
     path::Path,
 };
 
-use serde_json;
-
 use crate::{data::Data, Result};
 
 /// Attempts to deserialize a Data struct from a string
@@ -48,7 +46,7 @@ pub fn to_vec(data: &Data) -> Result<Vec<u8>> {
 pub fn to_writer<W: Write>(data: &Data, writer: W) -> Result<()> {
     let mut buf_writer = BufWriter::new(writer);
     let vec = to_vec(data)?;
-    buf_writer.write(&vec)?;
+    buf_writer.write_all(&vec)?;
     Ok(())
 }
 

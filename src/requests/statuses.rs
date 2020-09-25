@@ -1,6 +1,5 @@
 use crate::errors::Error;
 use serde::Serialize;
-use serde_qs;
 use std::{borrow::Cow, convert::Into};
 
 mod bool_qs_serialize {
@@ -59,7 +58,7 @@ impl<'a> Into<Option<StatusesRequest<'a>>> for &'a mut StatusesRequest<'a> {
             pinned: self.pinned,
             max_id: self.max_id.clone(),
             since_id: self.since_id.clone(),
-            limit: self.limit.clone(),
+            limit: self.limit,
             min_id: self.min_id.clone(),
         })
     }

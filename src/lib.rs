@@ -69,7 +69,7 @@
     unused_import_braces,
     unused_qualifications
 )]
-#![allow(broken_intra_doc_links)]
+#![cfg_attr(feature = "nightly", allow(broken_intra_doc_links))]
 
 use std::{borrow::Cow, io::BufRead, ops};
 
@@ -254,9 +254,9 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
         let status = response.status();
 
         if status.is_client_error() {
-            return Err(Error::Client(status.clone()));
+            return Err(Error::Client(status));
         } else if status.is_server_error() {
-            return Err(Error::Server(status.clone()));
+            return Err(Error::Server(status));
         }
 
         deserialise(response)
@@ -270,9 +270,9 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
         let status = response.status();
 
         if status.is_client_error() {
-            return Err(Error::Client(status.clone()));
+            return Err(Error::Client(status));
         } else if status.is_server_error() {
-            return Err(Error::Server(status.clone()));
+            return Err(Error::Server(status));
         }
 
         deserialise(response)
@@ -286,9 +286,9 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
         let status = response.status();
 
         if status.is_client_error() {
-            return Err(Error::Client(status.clone()));
+            return Err(Error::Client(status));
         } else if status.is_server_error() {
-            return Err(Error::Server(status.clone()));
+            return Err(Error::Server(status));
         }
 
         deserialise(response)
@@ -627,7 +627,7 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
                 .multipart(form_data),
         )?;
 
-        let status = response.status().clone();
+        let status = response.status();
 
         if status.is_client_error() {
             return Err(Error::Client(status));
@@ -675,7 +675,7 @@ impl<R: EventStream> Iterator for EventReader<R> {
         loop {
             if let Ok(line) = self.0.read_message() {
                 let line = line.trim().to_string();
-                if line.starts_with(":") || line.is_empty() {
+                if line.starts_with(':') || line.is_empty() {
                     continue;
                 }
                 lines.push(line);
@@ -773,7 +773,7 @@ impl<H: HttpSend> MastodonBuilder<H> {
     pub fn build(self) -> Result<Mastodon<H>> {
         Ok(if let Some(data) = self.data {
             Mastodon {
-                client: self.client.unwrap_or_else(|| Client::new()),
+                client: self.client.unwrap_or_else(Client::new),
                 http_sender: self.http_sender,
                 data,
             }

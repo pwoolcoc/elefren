@@ -48,6 +48,9 @@ pub struct StatusesRequest<'a> {
     limit: Option<usize>,
     #[serde(skip_serializing_if = "Option::is_none")]
     min_id: Option<Cow<'a, str>>,
+    #[serde(skip_serializing_if = "bool_qs_serialize::is_false")]
+    #[serde(serialize_with = "bool_qs_serialize::serialize")]
+    exclude_reblogs: bool,
 }
 
 impl<'a> Into<Option<StatusesRequest<'a>>> for &'a mut StatusesRequest<'a> {
@@ -60,6 +63,7 @@ impl<'a> Into<Option<StatusesRequest<'a>>> for &'a mut StatusesRequest<'a> {
             since_id: self.since_id.clone(),
             limit: self.limit,
             min_id: self.min_id.clone(),
+            exclude_reblogs: self.exclude_reblogs,
         })
     }
 }
@@ -257,6 +261,7 @@ mod tests {
                 since_id: None,
                 limit: None,
                 min_id: None,
+                exclude_reblogs: false,
             }
         );
     }
@@ -275,6 +280,7 @@ mod tests {
                 since_id: None,
                 limit: None,
                 min_id: None,
+                exclude_reblogs: false,
             }
         );
     }
@@ -293,6 +299,7 @@ mod tests {
                 since_id: None,
                 limit: None,
                 min_id: None,
+                exclude_reblogs: false,
             }
         );
     }
@@ -310,6 +317,7 @@ mod tests {
                 since_id: None,
                 limit: None,
                 min_id: None,
+                exclude_reblogs: false,
             }
         );
     }
@@ -327,6 +335,7 @@ mod tests {
                 since_id: None,
                 limit: None,
                 min_id: None,
+                exclude_reblogs: false,
             }
         );
     }
@@ -344,6 +353,7 @@ mod tests {
                 since_id: Some("foo".into()),
                 limit: None,
                 min_id: None,
+                exclude_reblogs: false,
             }
         );
     }
@@ -361,6 +371,7 @@ mod tests {
                 since_id: None,
                 limit: Some(42),
                 min_id: None,
+                exclude_reblogs: false,
             }
         );
     }
@@ -378,6 +389,7 @@ mod tests {
                 since_id: None,
                 limit: None,
                 min_id: Some("foo".into()),
+                exclude_reblogs: false,
             }
         );
     }

@@ -11,13 +11,18 @@ env:
 
 jobs:
   ci:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         rust:
           - stable
           - beta
           - nightly
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -36,7 +41,7 @@ jobs:
           command: test
           args: --features all --verbose
       - uses: actions-rs/cargo@v1
-        if: ${{ matrix.rust == 'nightly' }}
+        if: ${{ matrix.rust == 'nightly' && matrix.os == 'ubuntu-latest' }}
         with:
           command: fmt
           args: --verbose --all -- --check

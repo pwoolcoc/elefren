@@ -7,7 +7,11 @@ use crate::{
     media_builder::MediaBuilder,
     page::Page,
     requests::{
-        AddFilterRequest, AddPushRequest, StatusesRequest, UpdateCredsRequest, UpdatePushRequest,
+        AddFilterRequest,
+        AddPushRequest,
+        StatusesRequest,
+        UpdateCredsRequest,
+        UpdatePushRequest,
     },
     status_builder::NewStatus,
 };

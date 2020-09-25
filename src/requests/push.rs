@@ -606,7 +606,9 @@ mod tests {
             form,
             update_data::Form {
                 id: "some-id".to_string(),
-                data: update_data::Data { alerts: None },
+                data: update_data::Data {
+                    alerts: None
+                },
             }
         );
     }

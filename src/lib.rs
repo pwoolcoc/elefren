@@ -90,7 +90,11 @@ pub use crate::{
     media_builder::MediaBuilder,
     registration::Registration,
     requests::{
-        AddFilterRequest, AddPushRequest, StatusesRequest, UpdateCredsRequest, UpdatePushRequest,
+        AddFilterRequest,
+        AddPushRequest,
+        StatusesRequest,
+        UpdateCredsRequest,
+        UpdatePushRequest,
     },
     status_builder::{NewStatus, StatusBuilder},
 };
@@ -126,7 +130,13 @@ mod macros;
 /// Automatically import the things you need
 pub mod prelude {
     pub use crate::{
-        scopes::Scopes, Data, Mastodon, MastodonClient, NewStatus, Registration, StatusBuilder,
+        scopes::Scopes,
+        Data,
+        Mastodon,
+        MastodonClient,
+        NewStatus,
+        Registration,
+        StatusBuilder,
         StatusesRequest,
     };
 }
@@ -709,18 +719,18 @@ impl<R: EventStream> EventReader<R> {
                 })?;
                 let notification = serde_json::from_str::<Notification>(&data)?;
                 Event::Notification(notification)
-            }
+            },
             "update" => {
                 let data =
                     data.ok_or_else(|| Error::Other("Missing `data` line for update".to_string()))?;
                 let status = serde_json::from_str::<Status>(&data)?;
                 Event::Update(status)
-            }
+            },
             "delete" => {
                 let data =
                     data.ok_or_else(|| Error::Other("Missing `data` line for delete".to_string()))?;
                 Event::Delete(data)
-            }
+            },
             "filters_changed" => Event::FiltersChanged,
             _ => return Err(Error::Other(format!("Unknown event `{}`", event))),
         })
@@ -862,7 +872,7 @@ fn deserialise<T: for<'de> serde::Deserialize<'de>>(response: Response) -> Resul
         Ok(t) => {
             log::debug!("{}", String::from_utf8_lossy(&reader.bytes));
             Ok(t)
-        }
+        },
         // If deserializing into the desired type fails try again to
         // see if this is an error response.
         Err(e) => {
@@ -871,6 +881,6 @@ fn deserialise<T: for<'de> serde::Deserialize<'de>>(response: Response) -> Resul
                 return Err(Error::Api(error));
             }
             Err(e.into())
-        }
+        },
     }
 }

@@ -6,10 +6,8 @@ use std::{
     str::FromStr,
 };
 
-use serde::ser::{Serialize, Serializer};
-
 use crate::errors::Error;
-use serde::{Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serialize};
 use serde::de::{self, Visitor};
 
 /// Represents a set of OAuth scopes
@@ -47,7 +45,7 @@ impl FromStr for Scopes {
 impl Serialize for Scopes {
     fn serialize<S>(&self, serializer: S) -> ::std::result::Result<S::Ok, S::Error>
     where
-        S: Serializer,
+        S: serde::ser::Serializer,
     {
         let repr = format!("{}", self);
         serializer.serialize_str(&repr)

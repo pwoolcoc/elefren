@@ -1,5 +1,6 @@
 //! Module containing all info about notifications.
 
+use serde::Deserialize;
 use super::{account::Account, status::Status};
 use chrono::prelude::*;
 

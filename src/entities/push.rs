@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 /// Represents the `alerts` key of the `Subscription` object
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, Default)]
 pub struct Alerts {
@@ -25,6 +27,7 @@ pub struct Subscription {
 }
 
 pub(crate) mod add_subscription {
+    use serde::Serialize;
     use super::Alerts;
 
     #[derive(Debug, Clone, PartialEq, Serialize, Default)]
@@ -52,6 +55,7 @@ pub(crate) mod add_subscription {
 }
 
 pub(crate) mod update_data {
+    use serde::Serialize;
     use super::Alerts;
 
     #[derive(Debug, Clone, PartialEq, Serialize, Default)]

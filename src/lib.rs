@@ -69,40 +69,7 @@
     unused_import_braces,
     unused_qualifications
 )]
-#![allow(intra_doc_link_resolution_failure)]
-
-#[macro_use]
-extern crate log;
-#[macro_use]
-extern crate serde_derive;
-#[macro_use]
-extern crate doc_comment;
-extern crate hyper_old_types;
-extern crate isolang;
-#[macro_use]
-extern crate serde_json;
-extern crate chrono;
-extern crate reqwest;
-extern crate serde;
-extern crate serde_qs;
-extern crate serde_urlencoded;
-extern crate tap_reader;
-extern crate try_from;
-extern crate url;
-extern crate tungstenite;
-
-#[cfg(feature = "env")]
-extern crate envy;
-
-#[cfg(feature = "toml")]
-extern crate toml as tomlcrate;
-
-#[cfg(test)]
-extern crate tempfile;
-
-#[cfg(test)]
-#[cfg_attr(all(test, any(feature = "toml", feature = "json")), macro_use)]
-extern crate indoc;
+#![allow(broken_intra_doc_links)]
 
 use std::{
     borrow::Cow,
@@ -724,6 +691,7 @@ impl<R: EventStream> EventReader<R> {
             event = event_line[6..].trim().to_string();
             data = lines.iter().find(|line| line.starts_with("data:")).map(|x| x[5..].trim().to_string());
         } else {
+            use serde::Deserialize;
             #[derive(Deserialize)]
             struct Message {
                 pub event: String,
@@ -891,13 +859,13 @@ fn deserialise<T: for<'de> serde::Deserialize<'de>>(response: Response) -> Resul
 
     match serde_json::from_reader(&mut reader) {
         Ok(t) => {
-            debug!("{}", String::from_utf8_lossy(&reader.bytes));
+            log::debug!("{}", String::from_utf8_lossy(&reader.bytes));
             Ok(t)
         },
         // If deserializing into the desired type fails try again to
         // see if this is an error response.
         Err(e) => {
-            error!("{}", String::from_utf8_lossy(&reader.bytes));
+            log::error!("{}", String::from_utf8_lossy(&reader.bytes));
             if let Ok(error) = serde_json::from_slice(&reader.bytes) {
                 return Err(Error::Api(error));
             }

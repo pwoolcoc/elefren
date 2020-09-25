@@ -1,4 +1,5 @@
 use isolang::Language;
+use serde::{Deserialize, Serialize};
 
 /// A builder pattern struct for constructing a status.
 ///

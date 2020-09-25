@@ -1,3 +1,5 @@
+use serde::{Serialize, Deserialize};
+
 /// Represents a single Filter
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Filter {

@@ -1,4 +1,5 @@
 //! Module containing everything related to an instance.
+use serde::Deserialize;
 use super::account::Account;
 
 /// A struct containing info of an instance.

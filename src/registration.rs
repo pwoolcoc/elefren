@@ -1,6 +1,7 @@
 use std::borrow::Cow;
 
 use reqwest::{Client, RequestBuilder, Response};
+use serde::Deserialize;
 use try_from::TryInto;
 use url::percent_encoding::{utf8_percent_encode, DEFAULT_ENCODE_SET};
 

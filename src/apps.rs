@@ -1,5 +1,6 @@
 use std::borrow::Cow;
 
+use serde::Serialize;
 use try_from::TryInto;
 
 use crate::errors::{Error, Result};

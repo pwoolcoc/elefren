@@ -11,7 +11,7 @@ macro_rules! pages {
     ($($direction:ident: $fun:ident),*) => {
 
         $(
-            doc_comment!(concat!(
+            doc_comment::doc_comment!(concat!(
                     "Method to retrieve the ", stringify!($direction), " page of results"),
             pub fn $fun(&mut self) -> Result<Option<Vec<T>>> {
                 let url = match self.$direction.take() {

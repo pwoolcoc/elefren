@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use serde::Serialize;
 
 /// A builder pattern struct for constructing a media attachment.
 #[derive(Debug, Default, Clone, Serialize)]

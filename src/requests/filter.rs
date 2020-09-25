@@ -1,5 +1,6 @@
 use crate::entities::filter::FilterContext;
 use std::time::Duration;
+use serde::Serialize;
 
 /// Form used to create a filter
 ///

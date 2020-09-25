@@ -17,7 +17,7 @@ macro_rules! methods {
 macro_rules! paged_routes {
 
     (($method:ident) $name:ident: $url:expr => $ret:ty, $($rest:tt)*) => {
-        doc_comment! {
+        doc_comment::doc_comment! {
             concat!(
             "Equivalent to `", stringify!($method), " /api/v1/",
             $url,
@@ -55,7 +55,7 @@ macro_rules! paged_routes {
     };
 
     ((get ($($(#[$m:meta])* $param:ident: $typ:ty,)*)) $name:ident: $url:expr => $ret:ty, $($rest:tt)*) => {
-        doc_comment! {
+        doc_comment::doc_comment! {
             concat!(
                 "Equivalent to `get /api/v1/",
                 $url,
@@ -63,6 +63,7 @@ macro_rules! paged_routes {
             ),
             fn $name<'a>(&self, $($param: $typ,)*) -> Result<Page<$ret, H>> {
                 use serde_urlencoded;
+                use serde::Serialize;
 
                 #[derive(Serialize)]
                 struct Data<'a> {
@@ -103,7 +104,7 @@ macro_rules! paged_routes {
 
 macro_rules! route_v2 {
     ((get ($($param:ident: $typ:ty,)*)) $name:ident: $url:expr => $ret:ty, $($rest:tt)*) => {
-        doc_comment! {
+        doc_comment::doc_comment! {
             concat!(
                 "Equivalent to `get /api/v2/",
                 $url,
@@ -111,6 +112,7 @@ macro_rules! route_v2 {
             ),
             fn $name<'a>(&self, $($param: $typ,)*) -> Result<$ret> {
                 use serde_urlencoded;
+                use serde::Serialize;
 
                 #[derive(Serialize)]
                 struct Data<'a> {
@@ -145,7 +147,7 @@ macro_rules! route_v2 {
 macro_rules! route {
 
     ((get ($($param:ident: $typ:ty,)*)) $name:ident: $url:expr => $ret:ty, $($rest:tt)*) => {
-        doc_comment! {
+        doc_comment::doc_comment! {
             concat!(
                 "Equivalent to `get /api/v1/",
                 $url,
@@ -153,6 +155,7 @@ macro_rules! route {
             ),
             fn $name<'a>(&self, $($param: $typ,)*) -> Result<$ret> {
                 use serde_urlencoded;
+                use serde::Serialize;
 
                 #[derive(Serialize)]
                 struct Data<'a> {
@@ -182,7 +185,7 @@ macro_rules! route {
     };
 
     (($method:ident ($($param:ident: $typ:ty,)*)) $name:ident: $url:expr => $ret:ty, $($rest:tt)*) => {
-        doc_comment! {
+        doc_comment::doc_comment! {
             concat!(
                 "Equivalent to `", stringify!($method), " /api/v1/",
                 $url,
@@ -190,7 +193,7 @@ macro_rules! route {
             ),
             fn $name(&self, $($param: $typ,)*) -> Result<$ret> {
 
-                let form_data = json!({
+                let form_data = serde_json::json!({
                     $(
                         stringify!($param): $param,
                     )*
@@ -217,7 +220,7 @@ macro_rules! route {
     };
 
     (($method:ident) $name:ident: $url:expr => $ret:ty, $($rest:tt)*) => {
-        doc_comment! {
+        doc_comment::doc_comment! {
             concat!(
                 "Equivalent to `", stringify!($method), " /api/v1/",
                 $url,
@@ -255,7 +258,7 @@ macro_rules! route_id {
 
     ($(($method:ident) $name:ident: $url:expr => $ret:ty,)*) => {
         $(
-            doc_comment! {
+            doc_comment::doc_comment! {
                 concat!(
                     "Equivalent to `", stringify!($method), " /api/v1/",
                     $url,
@@ -289,7 +292,7 @@ macro_rules! route_id {
 macro_rules! paged_routes_with_id {
 
     (($method:ident) $name:ident: $url:expr => $ret:ty, $($rest:tt)*) => {
-        doc_comment! {
+        doc_comment::doc_comment! {
             concat!(
                 "Equivalent to `", stringify!($method), " /api/v1/",
                 $url,

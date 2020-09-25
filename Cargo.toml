@@ -10,22 +10,22 @@ keywords = ["api", "web", "social", "mastodon", "wrapper"]
 categories = ["web-programming", "web-programming::http-client", "api-bindings"]
 edition = "2018"
 
+
 [dependencies]
 doc-comment = "0.3"
+envy = { version = "0.4.0", optional = true }
+hyper-old-types = "0.11.0"
 isolang = { version = "1.0", features = ["serde_serialize"] }
+log = "0.4.6"
 reqwest = { version = "0.9", default-features = false }
-serde = "1"
-serde_derive = "1"
+serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 serde_urlencoded = "0.6.1"
 serde_qs = "0.6.0"
 url = "1"
 tap-reader = "1"
-try_from = "0.3.2"
 toml = { version = "0.5.0", optional = true }
-hyper-old-types = "0.11.0"
-envy = { version = "0.4.0", optional = true }
-log = "0.4.6"
+try_from = "0.3.2"
 tungstenite = "0.10.1"
 
 [dependencies.chrono]
@@ -38,9 +38,6 @@ json = []
 env = ["envy"]
 all = ["toml", "json", "env"]
 rustls-tls = ["reqwest/rustls-tls"]
-
-[build-dependencies]
-skeptic = "0.13.3"
 
 [dev-dependencies]
 skeptic = "0.13.3"

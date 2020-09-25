@@ -1,7 +1,8 @@
 //! A module containing everything relating to a account returned from the api.
 
 use chrono::prelude::*;
-use serde::de::{self, Deserialize, Deserializer, Unexpected};
+use serde::{Deserialize, Serialize};
+use serde::de::{self, Unexpected};
 use crate::status_builder;
 use std::path::PathBuf;
 
@@ -79,7 +80,7 @@ pub struct Source {
     fields: Option<Vec<MetadataField>>,
 }
 
-fn string_or_bool<'de, D: Deserializer<'de>>(val: D) -> ::std::result::Result<bool, D::Error> {
+fn string_or_bool<'de, D: de::Deserializer<'de>>(val: D) -> ::std::result::Result<bool, D::Error> {
     #[derive(Clone, Debug, Deserialize, PartialEq)]
     #[serde(untagged)]
     pub enum BoolOrString {

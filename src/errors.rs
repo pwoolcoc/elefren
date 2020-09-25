@@ -1,4 +1,5 @@
 use std::{error, fmt, io::Error as IoError};
+use serde::Deserialize;
 
 #[cfg(feature = "env")]
 use envy::Error as EnvyError;
@@ -8,9 +9,9 @@ use serde_json::Error as SerdeError;
 use serde_qs::Error as SerdeQsError;
 use serde_urlencoded::ser::Error as UrlEncodedError;
 #[cfg(feature = "toml")]
-use crate::tomlcrate::de::Error as TomlDeError;
+use ::toml::de::Error as TomlDeError;
 #[cfg(feature = "toml")]
-use crate::tomlcrate::ser::Error as TomlSerError;
+use ::toml::ser::Error as TomlSerError;
 use url::ParseError as UrlError;
 use tungstenite::error::Error as WebSocketError;
 
@@ -237,8 +238,7 @@ mod tests {
     #[cfg(feature = "toml")]
     #[test]
     fn from_toml_de_error() {
-        use crate::tomlcrate;
-        let err: TomlDeError = tomlcrate::from_str::<()>("not valid toml").unwrap_err();
+        let err: TomlDeError = ::toml::from_str::<()>("not valid toml").unwrap_err();
         let err: Error = Error::from(err);
         assert_is!(err, Error::TomlDe(..));
     }

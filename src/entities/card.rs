@@ -1,4 +1,5 @@
 //! Module representing cards of statuses.
+use serde::Deserialize;
 
 /// A card of a status.
 #[derive(Debug, Clone, Deserialize, PartialEq)]

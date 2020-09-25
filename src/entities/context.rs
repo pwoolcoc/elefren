@@ -1,4 +1,5 @@
 //! A module about contexts of statuses.
+use serde::Deserialize;
 
 use super::status::Status;
 

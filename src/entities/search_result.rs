@@ -1,4 +1,5 @@
 //! A module containing info relating to a search result.
+use serde::Deserialize;
 
 use super::{
     prelude::{Account, Status},

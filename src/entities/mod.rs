@@ -1,3 +1,5 @@
+use serde::Deserialize;
+
 /// Data structures for ser/de of account-related resources
 pub mod account;
 /// Data structures for ser/de of attachment-related resources

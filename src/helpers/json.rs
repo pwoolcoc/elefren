@@ -83,7 +83,7 @@ mod tests {
     use std::{fs::OpenOptions, io::Cursor};
     use tempfile::{tempdir, NamedTempFile};
 
-    const DOC: &'static str = indoc!(
+    const DOC: &'static str = indoc::indoc!(
         r#"
             {
                 "base": "https://example.com",

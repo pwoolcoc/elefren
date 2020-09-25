@@ -4,6 +4,7 @@ use super::prelude::*;
 use chrono::prelude::*;
 use crate::entities::card::Card;
 use crate::status_builder::Visibility;
+use serde::Deserialize;
 
 /// A status from the instance.
 #[derive(Debug, Clone, Deserialize, PartialEq)]

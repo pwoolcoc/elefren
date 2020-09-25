@@ -293,7 +293,7 @@ impl fmt::Display for Scopes {
 /// Permission scope of the application.
 /// [Details on what each permission provides][1]
 /// [1]: https://github.com/tootsuite/documentation/blob/master/Using-the-API/OAuth-details.md)
-#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Eq, Hash, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize)]
 enum Scope {
     /// Read only permissions.
     #[serde(rename = "read")]
@@ -331,9 +331,9 @@ impl FromStr for Scope {
     }
 }
 
-impl Ord for Scope {
-    fn cmp(&self, other: &Scope) -> Ordering {
-        match (*self, *other) {
+impl PartialOrd for Scope {
+    fn partial_cmp(&self, other: &Scope) -> Option<Ordering> {
+        Some(match (*self, *other) {
             (Scope::Read(None), Scope::Read(None)) => Ordering::Equal,
             (Scope::Read(None), Scope::Read(Some(..))) => Ordering::Less,
             (Scope::Read(Some(..)), Scope::Read(None)) => Ordering::Greater,
@@ -359,7 +359,13 @@ impl Ord for Scope {
 
             (Scope::Push, Scope::Push) => Ordering::Equal,
             (Scope::Push, _) => Ordering::Greater,
-        }
+        })
+    }
+}
+
+impl Ord for Scope {
+    fn cmp(&self, other: &Scope) -> Ordering {
+        PartialOrd::partial_cmp(self, other).unwrap()
     }
 }
 

@@ -7,8 +7,12 @@ use std::{
 };
 
 use crate::errors::Error;
-use serde::{Deserialize, Deserializer, Serialize};
-use serde::de::{self, Visitor};
+use serde::{
+    de::{self, Visitor},
+    Deserialize,
+    Deserializer,
+    Serialize,
+};
 
 /// Represents a set of OAuth scopes
 ///
@@ -62,15 +66,18 @@ impl<'de> Visitor<'de> for DeserializeScopesVisitor {
     }
 
     fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
-        where E: de::Error
+    where
+        E: de::Error,
     {
         Scopes::from_str(v).map_err(de::Error::custom)
     }
 }
 
 impl<'de> Deserialize<'de> for Scopes {
-    fn deserialize<D>(deserializer: D) -> Result<Self, <D as Deserializer<'de>>::Error> where
-        D: Deserializer<'de> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, <D as Deserializer<'de>>::Error>
+    where
+        D: Deserializer<'de>,
+    {
         deserializer.deserialize_str(DeserializeScopesVisitor)
     }
 }
@@ -762,7 +769,7 @@ mod tests {
             let expected = format!("\"{}\"", b);
             assert_eq!(&ser, &expected);
 
-            let des : Scopes = serde_json::from_str(&ser).expect("Couldn't deserialize Scopes");
+            let des: Scopes = serde_json::from_str(&ser).expect("Couldn't deserialize Scopes");
             assert_eq!(&des, a);
         }
     }

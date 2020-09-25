@@ -71,34 +71,34 @@
 )]
 #![allow(broken_intra_doc_links)]
 
-use std::{
-    borrow::Cow,
-    io::BufRead,
-    ops,
-};
+use std::{borrow::Cow, io::BufRead, ops};
 
 use reqwest::{Client, RequestBuilder, Response};
 use tap_reader::Tap;
 use tungstenite::client::AutoStream;
 
-use crate::entities::prelude::*;
-use crate::http_send::{HttpSend, HttpSender};
-use crate::page::Page;
-
-pub use crate::data::Data;
-pub use crate::errors::{ApiError, Error, Result};
-pub use isolang::Language;
-pub use crate::mastodon_client::{MastodonClient, MastodonUnauthenticated};
-pub use crate::media_builder::MediaBuilder;
-pub use crate::registration::Registration;
-pub use crate::requests::{
-    AddFilterRequest,
-    AddPushRequest,
-    StatusesRequest,
-    UpdateCredsRequest,
-    UpdatePushRequest,
+use crate::{
+    entities::prelude::*,
+    http_send::{HttpSend, HttpSender},
+    page::Page,
 };
-pub use crate::status_builder::{NewStatus, StatusBuilder};
+
+pub use crate::{
+    data::Data,
+    errors::{ApiError, Error, Result},
+    mastodon_client::{MastodonClient, MastodonUnauthenticated},
+    media_builder::MediaBuilder,
+    registration::Registration,
+    requests::{
+        AddFilterRequest,
+        AddPushRequest,
+        StatusesRequest,
+        UpdateCredsRequest,
+        UpdatePushRequest,
+    },
+    status_builder::{NewStatus, StatusBuilder},
+};
+pub use isolang::Language;
 
 /// Registering your App
 pub mod apps;
@@ -129,14 +129,16 @@ pub mod status_builder;
 mod macros;
 /// Automatically import the things you need
 pub mod prelude {
-    pub use crate::scopes::Scopes;
-    pub use crate::Data;
-    pub use crate::Mastodon;
-    pub use crate::MastodonClient;
-    pub use crate::NewStatus;
-    pub use crate::Registration;
-    pub use crate::StatusBuilder;
-    pub use crate::StatusesRequest;
+    pub use crate::{
+        scopes::Scopes,
+        Data,
+        Mastodon,
+        MastodonClient,
+        NewStatus,
+        Registration,
+        StatusBuilder,
+        StatusesRequest,
+    };
 }
 
 /// Your mastodon application client, handles all requests to and from Mastodon.
@@ -473,7 +475,8 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
             "https" => "wss",
             x => return Err(Error::Other(format!("Bad URL scheme: {}", x))),
         };
-        url.set_scheme(new_scheme).map_err(|_| Error::Other("Bad URL scheme!".to_string()))?;
+        url.set_scheme(new_scheme)
+            .map_err(|_| Error::Other("Bad URL scheme!".to_string()))?;
 
         let client = tungstenite::connect(url.as_str())?.0;
 
@@ -492,7 +495,8 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
             "https" => "wss",
             x => return Err(Error::Other(format!("Bad URL scheme: {}", x))),
         };
-        url.set_scheme(new_scheme).map_err(|_| Error::Other("Bad URL scheme!".to_string()))?;
+        url.set_scheme(new_scheme)
+            .map_err(|_| Error::Other("Bad URL scheme!".to_string()))?;
 
         let client = tungstenite::connect(url.as_str())?.0;
 
@@ -511,7 +515,8 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
             "https" => "wss",
             x => return Err(Error::Other(format!("Bad URL scheme: {}", x))),
         };
-        url.set_scheme(new_scheme).map_err(|_| Error::Other("Bad URL scheme!".to_string()))?;
+        url.set_scheme(new_scheme)
+            .map_err(|_| Error::Other("Bad URL scheme!".to_string()))?;
 
         let client = tungstenite::connect(url.as_str())?.0;
 
@@ -531,7 +536,8 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
             "https" => "wss",
             x => return Err(Error::Other(format!("Bad URL scheme: {}", x))),
         };
-        url.set_scheme(new_scheme).map_err(|_| Error::Other("Bad URL scheme!".to_string()))?;
+        url.set_scheme(new_scheme)
+            .map_err(|_| Error::Other("Bad URL scheme!".to_string()))?;
 
         let client = tungstenite::connect(url.as_str())?.0;
 
@@ -551,7 +557,8 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
             "https" => "wss",
             x => return Err(Error::Other(format!("Bad URL scheme: {}", x))),
         };
-        url.set_scheme(new_scheme).map_err(|_| Error::Other("Bad URL scheme!".to_string()))?;
+        url.set_scheme(new_scheme)
+            .map_err(|_| Error::Other("Bad URL scheme!".to_string()))?;
 
         let client = tungstenite::connect(url.as_str())?.0;
 
@@ -571,7 +578,8 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
             "https" => "wss",
             x => return Err(Error::Other(format!("Bad URL scheme: {}", x))),
         };
-        url.set_scheme(new_scheme).map_err(|_| Error::Other("Bad URL scheme!".to_string()))?;
+        url.set_scheme(new_scheme)
+            .map_err(|_| Error::Other("Bad URL scheme!".to_string()))?;
 
         let client = tungstenite::connect(url.as_str())?.0;
 
@@ -590,7 +598,8 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
             "https" => "wss",
             x => return Err(Error::Other(format!("Bad URL scheme: {}", x))),
         };
-        url.set_scheme(new_scheme).map_err(|_| Error::Other("Bad URL scheme!".to_string()))?;
+        url.set_scheme(new_scheme)
+            .map_err(|_| Error::Other("Bad URL scheme!".to_string()))?;
 
         let client = tungstenite::connect(url.as_str())?.0;
 
@@ -631,7 +640,8 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
 }
 
 #[derive(Debug)]
-/// WebSocket newtype so that EventStream can be implemented without coherency issues
+/// WebSocket newtype so that EventStream can be implemented without coherency
+/// issues
 pub struct WebSocket(tungstenite::protocol::WebSocket<AutoStream>);
 
 /// A type that streaming events can be read from
@@ -684,12 +694,12 @@ impl<R: EventStream> EventReader<R> {
     fn make_event(&self, lines: &[String]) -> Result<Event> {
         let event;
         let data;
-        if let Some(event_line) = lines
-            .iter()
-            .find(|line| line.starts_with("event:"))
-        {
+        if let Some(event_line) = lines.iter().find(|line| line.starts_with("event:")) {
             event = event_line[6..].trim().to_string();
-            data = lines.iter().find(|line| line.starts_with("data:")).map(|x| x[5..].trim().to_string());
+            data = lines
+                .iter()
+                .find(|line| line.starts_with("data:"))
+                .map(|x| x[5..].trim().to_string());
         } else {
             use serde::Deserialize;
             #[derive(Deserialize)]
@@ -816,7 +826,8 @@ impl<H: HttpSend> MastodonUnauth<H> {
             "https" => "wss",
             x => return Err(Error::Other(format!("Bad URL scheme: {}", x))),
         };
-        url.set_scheme(new_scheme).map_err(|_| Error::Other("Bad URL scheme!".to_string()))?;
+        url.set_scheme(new_scheme)
+            .map_err(|_| Error::Other("Bad URL scheme!".to_string()))?;
 
         let client = tungstenite::connect(url.as_str())?.0;
 

@@ -4,8 +4,7 @@ use std::{
     path::Path,
 };
 
-use crate::data::Data;
-use crate::Result;
+use crate::{data::Data, Result};
 
 /// Attempts to deserialize a Data struct from a string
 pub fn from_str(s: &str) -> Result<Data> {

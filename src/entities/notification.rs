@@ -1,8 +1,8 @@
 //! Module containing all info about notifications.
 
-use serde::Deserialize;
 use super::{account::Account, status::Status};
 use chrono::prelude::*;
+use serde::Deserialize;
 
 /// A struct containing info about a notification.
 #[derive(Debug, Clone, Deserialize, PartialEq)]

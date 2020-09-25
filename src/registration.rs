@@ -5,14 +5,16 @@ use serde::Deserialize;
 use try_from::TryInto;
 use url::percent_encoding::{utf8_percent_encode, DEFAULT_ENCODE_SET};
 
-use crate::apps::{App, AppBuilder};
-use crate::http_send::{HttpSend, HttpSender};
-use crate::scopes::Scopes;
-use crate::Data;
-use crate::Error;
-use crate::Mastodon;
-use crate::MastodonBuilder;
-use crate::Result;
+use crate::{
+    apps::{App, AppBuilder},
+    http_send::{HttpSend, HttpSender},
+    scopes::Scopes,
+    Data,
+    Error,
+    Mastodon,
+    MastodonBuilder,
+    Result,
+};
 
 const DEFAULT_REDIRECT_URI: &'static str = "urn:ietf:wg:oauth:2.0:oob";
 

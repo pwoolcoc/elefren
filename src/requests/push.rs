@@ -1,5 +1,7 @@
-use crate::entities::push::{add_subscription, update_data};
-use crate::errors::Result;
+use crate::{
+    entities::push::{add_subscription, update_data},
+    errors::Result,
+};
 use serde::Serialize;
 
 /// Container for the key & auth strings for an AddPushRequest

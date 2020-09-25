@@ -1,5 +1,4 @@
-use crate::http_send::HttpSend;
-use crate::page::Page;
+use crate::{http_send::HttpSend, page::Page};
 use serde::Deserialize;
 
 /// Abstracts away the `next_page` logic into a single stream of items

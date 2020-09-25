@@ -1,18 +1,20 @@
 use std::borrow::Cow;
 
-use crate::entities::prelude::*;
-use crate::errors::Result;
-use crate::http_send::{HttpSend, HttpSender};
-use crate::media_builder::MediaBuilder;
-use crate::page::Page;
-use crate::requests::{
-    AddFilterRequest,
-    AddPushRequest,
-    StatusesRequest,
-    UpdateCredsRequest,
-    UpdatePushRequest,
+use crate::{
+    entities::prelude::*,
+    errors::Result,
+    http_send::{HttpSend, HttpSender},
+    media_builder::MediaBuilder,
+    page::Page,
+    requests::{
+        AddFilterRequest,
+        AddPushRequest,
+        StatusesRequest,
+        UpdateCredsRequest,
+        UpdatePushRequest,
+    },
+    status_builder::NewStatus,
 };
-use crate::status_builder::NewStatus;
 
 /// Represents the set of methods that a Mastodon Client can do, so that
 /// implementations might be swapped out for testing
@@ -197,11 +199,11 @@ pub trait MastodonClient<H: HttpSend = HttpSender> {
     fn new_status(&self, status: NewStatus) -> Result<Status> {
         unimplemented!("This method was not implemented");
     }
-/// GET /api/v1/timelines/public?local=true
+    /// GET /api/v1/timelines/public?local=true
     fn get_local_timeline(&self) -> Result<Page<Status, H>> {
         unimplemented!("This method was not implemented");
     }
-/// GET /api/v1/timelines/public?local=false
+    /// GET /api/v1/timelines/public?local=false
     fn get_federated_timeline(&self) -> Result<Page<Status, H>> {
         unimplemented!("This method was not implemented");
     }

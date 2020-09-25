@@ -1,9 +1,12 @@
 //! A module containing everything relating to a account returned from the api.
 
-use chrono::prelude::*;
-use serde::{Deserialize, Serialize};
-use serde::de::{self, Unexpected};
 use crate::status_builder;
+use chrono::prelude::*;
+use serde::{
+    de::{self, Unexpected},
+    Deserialize,
+    Serialize,
+};
 use std::path::PathBuf;
 
 /// A struct representing an Account.

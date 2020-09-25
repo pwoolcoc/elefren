@@ -1,5 +1,5 @@
+use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
-use serde::{Serialize, Deserialize};
 
 /// Raw data about mastodon app. Save `Data` using `serde` to prevent needing
 /// to authenticate on every run.

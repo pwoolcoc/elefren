@@ -1,7 +1,7 @@
 use crate::errors::Error;
+use serde::Serialize;
 use serde_qs;
 use std::{borrow::Cow, convert::Into};
-use serde::Serialize;
 
 mod bool_qs_serialize {
     use serde::Serializer;

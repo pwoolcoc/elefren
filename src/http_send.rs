@@ -1,6 +1,6 @@
+use crate::Result;
 use reqwest::{Client, Request, RequestBuilder, Response};
 use std::fmt::Debug;
-use crate::Result;
 
 /// Abstracts away the process of turning an HTTP request into an HTTP response
 pub trait HttpSend: Clone + Debug {

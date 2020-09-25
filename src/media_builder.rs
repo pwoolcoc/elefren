@@ -1,5 +1,5 @@
-use std::borrow::Cow;
 use serde::Serialize;
+use std::borrow::Cow;
 
 /// A builder pattern struct for constructing a media attachment.
 #[derive(Debug, Default, Clone, Serialize)]
@@ -21,6 +21,7 @@ impl MediaBuilder {
             focus: None,
         }
     }
+
     /// Set an alt text description for the attachment.
     pub fn description(mut self, description: Cow<'static, str>) -> Self {
         self.description = Some(description);

@@ -27,8 +27,8 @@ pub struct Subscription {
 }
 
 pub(crate) mod add_subscription {
-    use serde::Serialize;
     use super::Alerts;
+    use serde::Serialize;
 
     #[derive(Debug, Clone, PartialEq, Serialize, Default)]
     pub(crate) struct Form {
@@ -55,8 +55,8 @@ pub(crate) mod add_subscription {
 }
 
 pub(crate) mod update_data {
-    use serde::Serialize;
     use super::Alerts;
+    use serde::Serialize;
 
     #[derive(Debug, Clone, PartialEq, Serialize, Default)]
     pub(crate) struct Data {

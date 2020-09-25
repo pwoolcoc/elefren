@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 /// Represents a single Filter
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

@@ -3,9 +3,11 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::entities::account::{Credentials, MetadataField, UpdateSource};
-use crate::errors::Result;
-use crate::status_builder;
+use crate::{
+    entities::account::{Credentials, MetadataField, UpdateSource},
+    errors::Result,
+    status_builder,
+};
 
 /// Builder to pass to the Mastodon::update_credentials method
 ///
@@ -202,8 +204,10 @@ impl UpdateCredsRequest {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::entities::account::{Credentials, MetadataField, UpdateSource};
-    use crate::status_builder::Visibility;
+    use crate::{
+        entities::account::{Credentials, MetadataField, UpdateSource},
+        status_builder::Visibility,
+    };
 
     #[test]
     fn test_update_creds_request_new() {

@@ -3,8 +3,10 @@ use std::borrow::Cow;
 use serde::Serialize;
 use try_from::TryInto;
 
-use crate::errors::{Error, Result};
-use crate::scopes::Scopes;
+use crate::{
+    errors::{Error, Result},
+    scopes::Scopes,
+};
 
 /// Represents an application that can be registered with a mastodon instance
 #[derive(Clone, Debug, Default, Serialize, PartialEq)]

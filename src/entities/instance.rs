@@ -1,6 +1,6 @@
 //! Module containing everything related to an instance.
-use serde::Deserialize;
 use super::account::Account;
+use serde::Deserialize;
 
 /// A struct containing info of an instance.
 #[derive(Debug, Clone, Deserialize, PartialEq)]

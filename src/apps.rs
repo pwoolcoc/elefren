@@ -61,7 +61,7 @@ impl App {
 /// use elefren::apps::App;
 /// use std::error::Error;
 ///
-/// # fn main() -> Result<(), Box<Error>> {
+/// # fn main() -> Result<(), Box<dyn Error>> {
 /// let mut builder = App::builder();
 /// builder.client_name("elefren_test");
 /// let app = builder.build()?;
@@ -120,7 +120,7 @@ impl<'a> AppBuilder<'a> {
         Ok(App {
             client_name: self
                 .client_name
-                .ok_or_else(|| Error::MissingField("client_name"))?
+                .ok_or(Error::MissingField("client_name"))?
                 .into(),
             redirect_uris: self
                 .redirect_uris

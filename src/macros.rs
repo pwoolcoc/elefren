@@ -40,7 +40,7 @@ macro_rules! paged_routes {
             "# }\n",
             "```"
             ),
-            fn $name(&self) -> Result<Page<$ret, H>> {
+            fn $name(&self) -> Result<Page<$ret>> {
                 let url = self.route(concat!("/api/v1/", $url));
                 let response = self.send(
                         self.client.$method(&url)
@@ -61,7 +61,7 @@ macro_rules! paged_routes {
                 $url,
                 "`\n# Errors\nIf `access_token` is not set."
             ),
-            fn $name<'a>(&self, $($param: $typ,)*) -> Result<Page<$ret, H>> {
+            fn $name<'a>(&self, $($param: $typ,)*) -> Result<Page<$ret>> {
                 use serde_urlencoded;
                 use serde::Serialize;
 
@@ -315,7 +315,7 @@ macro_rules! paged_routes_with_id {
                 "# }\n",
                 "```"
             ),
-            fn $name(&self, id: &str) -> Result<Page<$ret, H>> {
+            fn $name(&self, id: &str) -> Result<Page<$ret>> {
                 let url = self.route(&format!(concat!("/api/v1/", $url), id));
                 let response = self.send(
                         self.client.$method(&url)

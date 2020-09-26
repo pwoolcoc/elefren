@@ -5,8 +5,6 @@ use reqwest::{header::LINK, Response};
 use serde::Deserialize;
 use url::Url;
 
-use crate::http_send::HttpSend;
-
 macro_rules! pages {
     ($($direction:ident: $fun:ident),*) => {
 
@@ -42,7 +40,6 @@ macro_rules! pages {
 /// # extern crate elefren;
 /// # use elefren::Mastodon;
 /// # use elefren::page::OwnedPage;
-/// # use elefren::http_send::HttpSender;
 /// # use elefren::entities::status::Status;
 /// # use std::cell::RefCell;
 /// # use elefren::prelude::*;
@@ -56,7 +53,7 @@ macro_rules! pages {
 /// # };
 /// struct HomeTimeline {
 ///     client: Mastodon,
-///     page: RefCell<Option<OwnedPage<Status, HttpSender>>>,
+///     page: RefCell<Option<OwnedPage<Status>>>,
 /// }
 /// let client = Mastodon::from(data);
 /// let home = client.get_home_timeline()?.into_owned();
@@ -68,23 +65,23 @@ macro_rules! pages {
 /// # }
 /// ```
 #[derive(Debug, Clone)]
-pub struct OwnedPage<T: for<'de> Deserialize<'de>, H: HttpSend> {
-    mastodon: Mastodon<H>,
+pub struct OwnedPage<T: for<'de> Deserialize<'de>> {
+    mastodon: Mastodon,
     next: Option<Url>,
     prev: Option<Url>,
     /// Initial set of items
     pub initial_items: Vec<T>,
 }
 
-impl<T: for<'de> Deserialize<'de>, H: HttpSend> OwnedPage<T, H> {
+impl<T: for<'de> Deserialize<'de>> OwnedPage<T> {
     pages! {
         next: next_page,
         prev: prev_page
     }
 }
 
-impl<'a, T: for<'de> Deserialize<'de>, H: HttpSend> From<Page<'a, T, H>> for OwnedPage<T, H> {
-    fn from(page: Page<'a, T, H>) -> OwnedPage<T, H> {
+impl<'a, T: for<'de> Deserialize<'de>> From<Page<'a, T>> for OwnedPage<T> {
+    fn from(page: Page<'a, T>) -> OwnedPage<T> {
         OwnedPage {
             mastodon: page.mastodon.clone(),
             next: page.next,
@@ -96,21 +93,21 @@ impl<'a, T: for<'de> Deserialize<'de>, H: HttpSend> From<Page<'a, T, H>> for Own
 
 /// Represents a single page of API results
 #[derive(Debug, Clone)]
-pub struct Page<'a, T: for<'de> Deserialize<'de>, H: 'a + HttpSend> {
-    mastodon: &'a Mastodon<H>,
+pub struct Page<'a, T: for<'de> Deserialize<'de>> {
+    mastodon: &'a Mastodon,
     next: Option<Url>,
     prev: Option<Url>,
     /// Initial set of items
     pub initial_items: Vec<T>,
 }
 
-impl<'a, T: for<'de> Deserialize<'de>, H: HttpSend> Page<'a, T, H> {
+impl<'a, T: for<'de> Deserialize<'de>> Page<'a, T> {
     pages! {
         next: next_page,
         prev: prev_page
     }
 
-    pub(crate) fn new(mastodon: &'a Mastodon<H>, response: Response) -> Result<Self> {
+    pub(crate) fn new(mastodon: &'a Mastodon, response: Response) -> Result<Self> {
         let (prev, next) = get_links(&response)?;
         Ok(Page {
             initial_items: deserialise(response)?,
@@ -121,7 +118,7 @@ impl<'a, T: for<'de> Deserialize<'de>, H: HttpSend> Page<'a, T, H> {
     }
 }
 
-impl<'a, T: Clone + for<'de> Deserialize<'de>, H: HttpSend> Page<'a, T, H> {
+impl<'a, T: Clone + for<'de> Deserialize<'de>> Page<'a, T> {
     /// Returns an owned version of this struct that doesn't borrow the client
     /// that created it
     ///
@@ -131,7 +128,6 @@ impl<'a, T: Clone + for<'de> Deserialize<'de>, H: HttpSend> Page<'a, T, H> {
     /// # extern crate elefren;
     /// # use elefren::Mastodon;
     /// # use elefren::page::OwnedPage;
-    /// # use elefren::http_send::HttpSender;
     /// # use elefren::entities::status::Status;
     /// # use std::cell::RefCell;
     /// # use elefren::prelude::*;
@@ -145,7 +141,7 @@ impl<'a, T: Clone + for<'de> Deserialize<'de>, H: HttpSend> Page<'a, T, H> {
     /// # };
     /// struct HomeTimeline {
     ///     client: Mastodon,
-    ///     page: RefCell<Option<OwnedPage<Status, HttpSender>>>,
+    ///     page: RefCell<Option<OwnedPage<Status>>>,
     /// }
     /// let client = Mastodon::from(data);
     /// let home = client.get_home_timeline()?.into_owned();
@@ -156,7 +152,7 @@ impl<'a, T: Clone + for<'de> Deserialize<'de>, H: HttpSend> Page<'a, T, H> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn into_owned(self) -> OwnedPage<T, H> {
+    pub fn into_owned(self) -> OwnedPage<T> {
         OwnedPage::from(self)
     }
 
@@ -176,7 +172,7 @@ impl<'a, T: Clone + for<'de> Deserialize<'de>, H: HttpSend> Page<'a, T, H> {
     /// # extern crate elefren;
     /// # use std::error::Error;
     /// use elefren::prelude::*;
-    /// # fn main() -> Result<(), Box<Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error>> {
     /// #   let data = Data {
     /// #       base: "".into(),
     /// #       client_id: "".into(),

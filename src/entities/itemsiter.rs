@@ -1,4 +1,4 @@
-use crate::{http_send::HttpSend, page::Page};
+use crate::page::Page;
 use serde::Deserialize;
 
 /// Abstracts away the `next_page` logic into a single stream of items
@@ -7,7 +7,7 @@ use serde::Deserialize;
 /// # extern crate elefren;
 /// # use elefren::prelude::*;
 /// # use std::error::Error;
-/// # fn main() -> Result<(), Box<Error>> {
+/// # fn main() -> Result<(), Box<dyn Error>> {
 /// # let data = Data {
 /// #   base: "".into(),
 /// #   client_id: "".into(),
@@ -24,15 +24,15 @@ use serde::Deserialize;
 /// # }
 /// ```
 #[derive(Debug, Clone)]
-pub(crate) struct ItemsIter<'a, T: Clone + for<'de> Deserialize<'de>, H: 'a + HttpSend> {
-    page: Page<'a, T, H>,
+pub(crate) struct ItemsIter<'a, T: Clone + for<'de> Deserialize<'de>> {
+    page: Page<'a, T>,
     buffer: Vec<T>,
     cur_idx: usize,
     use_initial: bool,
 }
 
-impl<'a, T: Clone + for<'de> Deserialize<'de>, H: HttpSend> ItemsIter<'a, T, H> {
-    pub(crate) fn new(page: Page<'a, T, H>) -> ItemsIter<'a, T, H> {
+impl<'a, T: Clone + for<'de> Deserialize<'de>> ItemsIter<'a, T> {
+    pub(crate) fn new(page: Page<'a, T>) -> ItemsIter<'a, T> {
         ItemsIter {
             page,
             buffer: vec![],
@@ -64,7 +64,7 @@ impl<'a, T: Clone + for<'de> Deserialize<'de>, H: HttpSend> ItemsIter<'a, T, H> 
     }
 }
 
-impl<'a, T: Clone + for<'de> Deserialize<'de>, H: HttpSend> Iterator for ItemsIter<'a, T, H> {
+impl<'a, T: Clone + for<'de> Deserialize<'de>> Iterator for ItemsIter<'a, T> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {

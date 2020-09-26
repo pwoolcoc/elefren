@@ -7,7 +7,6 @@ use url::percent_encoding::{utf8_percent_encode, DEFAULT_ENCODE_SET};
 
 use crate::{
     apps::{App, AppBuilder},
-    http_send::{HttpSend, HttpSender},
     scopes::Scopes,
     Data,
     Error,
@@ -21,12 +20,11 @@ const DEFAULT_REDIRECT_URI: &str = "urn:ietf:wg:oauth:2.0:oob";
 /// Handles registering your mastodon app to your instance. It is recommended
 /// you cache your data struct to avoid registering on every run.
 #[derive(Debug, Clone)]
-pub struct Registration<'a, H: HttpSend = HttpSender> {
+pub struct Registration<'a> {
     base: String,
     client: Client,
     app_builder: AppBuilder<'a>,
     force_login: bool,
-    http_sender: H,
 }
 
 #[derive(Deserialize)]
@@ -46,7 +44,7 @@ struct AccessToken {
     access_token: String,
 }
 
-impl<'a> Registration<'a, HttpSender> {
+impl<'a> Registration<'a> {
     /// Construct a new registration process to the instance of the `base` url.
     /// ```
     /// use elefren::prelude::*;
@@ -59,23 +57,11 @@ impl<'a> Registration<'a, HttpSender> {
             client: Client::new(),
             app_builder: AppBuilder::new(),
             force_login: false,
-            http_sender: HttpSender,
         }
     }
 }
 
-impl<'a, H: HttpSend> Registration<'a, H> {
-    #[allow(dead_code)]
-    pub(crate) fn with_sender<I: Into<String>>(base: I, http_sender: H) -> Self {
-        Registration {
-            base: base.into(),
-            client: Client::new(),
-            app_builder: AppBuilder::new(),
-            force_login: false,
-            http_sender,
-        }
-    }
-
+impl<'a> Registration<'a> {
     /// Sets the name of this app
     ///
     /// This is required, and if this isn't set then the AppBuilder::build
@@ -113,7 +99,8 @@ impl<'a, H: HttpSend> Registration<'a, H> {
     }
 
     fn send(&self, req: RequestBuilder) -> Result<Response> {
-        Ok(self.http_sender.send(&self.client, req)?)
+        let req = req.build()?;
+        Ok(self.client.execute(req)?)
     }
 
     /// Register the given application
@@ -137,7 +124,7 @@ impl<'a, H: HttpSend> Registration<'a, H> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn register<I: TryInto<App>>(&mut self, app: I) -> Result<Registered<H>>
+    pub fn register<I: TryInto<App>>(&mut self, app: I) -> Result<Registered>
     where
         Error: From<<I as TryInto<App>>::Err>,
     {
@@ -152,7 +139,6 @@ impl<'a, H: HttpSend> Registration<'a, H> {
             redirect: oauth.redirect_uri,
             scopes: app.scopes().clone(),
             force_login: self.force_login,
-            http_sender: self.http_sender.clone(),
         })
     }
 
@@ -176,7 +162,7 @@ impl<'a, H: HttpSend> Registration<'a, H> {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn build(&mut self) -> Result<Registered<H>> {
+    pub fn build(&mut self) -> Result<Registered> {
         let app: App = self.app_builder.clone().build()?;
         let oauth = self.send_app(&app)?;
 
@@ -188,7 +174,6 @@ impl<'a, H: HttpSend> Registration<'a, H> {
             redirect: oauth.redirect_uri,
             scopes: app.scopes().clone(),
             force_login: self.force_login,
-            http_sender: self.http_sender.clone(),
         })
     }
 
@@ -198,7 +183,7 @@ impl<'a, H: HttpSend> Registration<'a, H> {
     }
 }
 
-impl Registered<HttpSender> {
+impl Registered {
     /// Skip having to retrieve the client id and secret from the server by
     /// creating a `Registered` struct directly
     ///
@@ -234,7 +219,7 @@ impl Registered<HttpSender> {
         redirect: &str,
         scopes: Scopes,
         force_login: bool,
-    ) -> Registered<HttpSender> {
+    ) -> Registered {
         Registered {
             base: base.to_string(),
             client: Client::new(),
@@ -243,14 +228,14 @@ impl Registered<HttpSender> {
             redirect: redirect.to_string(),
             scopes,
             force_login,
-            http_sender: HttpSender,
         }
     }
 }
 
-impl<H: HttpSend> Registered<H> {
+impl Registered {
     fn send(&self, req: RequestBuilder) -> Result<Response> {
-        Ok(self.http_sender.send(&self.client, req)?)
+        let req = req.build()?;
+        Ok(self.client.execute(req)?)
     }
 
     /// Returns the parts of the `Registered` struct that can be used to
@@ -324,7 +309,7 @@ impl<H: HttpSend> Registered<H> {
 
     /// Create an access token from the client id, client secret, and code
     /// provided by the authorisation url.
-    pub fn complete(&self, code: &str) -> Result<Mastodon<H>> {
+    pub fn complete(&self, code: &str) -> Result<Mastodon> {
         let url = format!(
             "{}/oauth/token?client_id={}&client_secret={}&code={}&grant_type=authorization_code&\
              redirect_uri={}",
@@ -341,7 +326,7 @@ impl<H: HttpSend> Registered<H> {
             token: token.access_token.into(),
         };
 
-        let mut builder = MastodonBuilder::new(self.http_sender.clone());
+        let mut builder = MastodonBuilder::new();
         builder.client(self.client.clone()).data(data);
         Ok(builder.build()?)
     }
@@ -350,7 +335,7 @@ impl<H: HttpSend> Registered<H> {
 /// Represents the state of the auth flow when the app has been registered but
 /// the user is not authenticated
 #[derive(Debug, Clone)]
-pub struct Registered<H: HttpSend> {
+pub struct Registered {
     base: String,
     client: Client,
     client_id: String,
@@ -358,7 +343,6 @@ pub struct Registered<H: HttpSend> {
     redirect: String,
     scopes: Scopes,
     force_login: bool,
-    http_sender: H,
 }
 
 #[cfg(test)]
@@ -370,15 +354,13 @@ mod tests {
         let r = Registration::new("https://example.com");
         assert_eq!(r.base, "https://example.com".to_string());
         assert_eq!(r.app_builder, AppBuilder::new());
-        assert_eq!(r.http_sender, HttpSender);
     }
 
     #[test]
     fn test_registration_with_sender() {
-        let r = Registration::with_sender("https://example.com", HttpSender);
+        let r = Registration::new("https://example.com");
         assert_eq!(r.base, "https://example.com".to_string());
         assert_eq!(r.app_builder, AppBuilder::new());
-        assert_eq!(r.http_sender, HttpSender);
     }
 
     #[test]

@@ -76,7 +76,7 @@ use elefren::entities::event::Event;
 
 use std::error::Error;
 
-fn main() -> Result<(), Box<Error>> {
+fn main() -> Result<(), Box<dyn Error>> {
     let data = Data {
       base: "".into(),
       client_id: "".into(),

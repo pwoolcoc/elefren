@@ -36,7 +36,7 @@
 //! # use elefren::prelude::*;
 //! # use std::error::Error;
 //! use elefren::entities::event::Event;
-//! # fn main() -> Result<(), Box<Error>> {
+//! # fn main() -> Result<(), Box<dyn Error>> {
 //! # let data = Data {
 //! #   base: "".into(),
 //! #   client_id: "".into(),
@@ -77,11 +77,7 @@ use reqwest::{Client, RequestBuilder, Response};
 use tap_reader::Tap;
 use tungstenite::client::AutoStream;
 
-use crate::{
-    entities::prelude::*,
-    http_send::{HttpSend, HttpSender},
-    page::Page,
-};
+use crate::{entities::prelude::*, page::Page};
 
 pub use crate::{
     data::Data,
@@ -110,8 +106,6 @@ pub mod entities;
 pub mod errors;
 /// Collection of helpers for serializing/deserializing `Data` objects
 pub mod helpers;
-/// Contains trait for converting `reqwest::Request`s to `reqwest::Response`s
-pub mod http_send;
 mod mastodon_client;
 /// Constructing media attachments for a status.
 pub mod media_builder;
@@ -143,14 +137,13 @@ pub mod prelude {
 
 /// Your mastodon application client, handles all requests to and from Mastodon.
 #[derive(Clone, Debug)]
-pub struct Mastodon<H: HttpSend = HttpSender> {
+pub struct Mastodon {
     client: Client,
-    http_sender: H,
     /// Raw data about your mastodon instance.
     pub data: Data,
 }
 
-impl<H: HttpSend> Mastodon<H> {
+impl Mastodon {
     methods![get, post, delete,];
 
     fn route(&self, url: &str) -> String {
@@ -158,16 +151,15 @@ impl<H: HttpSend> Mastodon<H> {
     }
 
     pub(crate) fn send(&self, req: RequestBuilder) -> Result<Response> {
-        Ok(self
-            .http_sender
-            .send(&self.client, req.bearer_auth(&self.token))?)
+        let request = req.bearer_auth(&self.token).build()?;
+        Ok(self.client.execute(request)?)
     }
 }
 
-impl From<Data> for Mastodon<HttpSender> {
+impl From<Data> for Mastodon {
     /// Creates a mastodon instance from the data struct.
-    fn from(data: Data) -> Mastodon<HttpSender> {
-        let mut builder = MastodonBuilder::new(HttpSender);
+    fn from(data: Data) -> Mastodon {
+        let mut builder = MastodonBuilder::new();
         builder.data(data);
         builder
             .build()
@@ -175,7 +167,7 @@ impl From<Data> for Mastodon<HttpSender> {
     }
 }
 
-impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
+impl MastodonClient for Mastodon {
     type Stream = EventReader<WebSocket>;
 
     paged_routes! {
@@ -307,7 +299,7 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
 
     /// Get timeline filtered by a hashtag(eg. `#coffee`) either locally or
     /// federated.
-    fn get_hashtag_timeline(&self, hashtag: &str, local: bool) -> Result<Page<Status, H>> {
+    fn get_hashtag_timeline(&self, hashtag: &str, local: bool) -> Result<Page<Status>> {
         let base = "/api/v1/timelines/tag/";
         let url = if local {
             self.route(&format!("{}{}?local=1", base, hashtag))
@@ -327,7 +319,7 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
     /// # extern crate elefren;
     /// # use elefren::prelude::*;
     /// # use std::error::Error;
-    /// # fn main() -> Result<(), Box<Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error>> {
     /// # let data = Data {
     /// #   base: "".into(),
     /// #   client_id: "".into(),
@@ -345,7 +337,7 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
     /// # extern crate elefren;
     /// # use elefren::prelude::*;
     /// # use std::error::Error;
-    /// # fn main() -> Result<(), Box<Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error>> {
     /// # let data = Data {
     /// #   base: "".into(),
     /// #   client_id: "".into(),
@@ -360,7 +352,7 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
     /// # Ok(())
     /// # }
     /// ```
-    fn statuses<'a, 'b: 'a, S>(&'b self, id: &'b str, request: S) -> Result<Page<Status, H>>
+    fn statuses<'a, 'b: 'a, S>(&'b self, id: &'b str, request: S) -> Result<Page<Status>>
     where
         S: Into<Option<StatusesRequest<'a>>>,
     {
@@ -377,7 +369,7 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
 
     /// Returns the client account's relationship to a list of other accounts.
     /// Such as whether they follow them or vice versa.
-    fn relationships(&self, ids: &[&str]) -> Result<Page<Relationship, H>> {
+    fn relationships(&self, ids: &[&str]) -> Result<Page<Relationship>> {
         let mut url = self.route("/api/v1/accounts/relationships?");
 
         if ids.len() == 1 {
@@ -423,13 +415,13 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
     }
 
     /// Get all accounts that follow the authenticated user
-    fn follows_me(&self) -> Result<Page<Account, H>> {
+    fn follows_me(&self) -> Result<Page<Account>> {
         let me = self.verify_credentials()?;
         Ok(self.followers(&me.id)?)
     }
 
     /// Get all accounts that the authenticated user follows
-    fn followed_by_me(&self) -> Result<Page<Account, H>> {
+    fn followed_by_me(&self) -> Result<Page<Account>> {
         let me = self.verify_credentials()?;
         Ok(self.following(&me.id)?)
     }
@@ -444,7 +436,7 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
     /// # use elefren::prelude::*;
     /// # use std::error::Error;
     /// use elefren::entities::event::Event;
-    /// # fn main() -> Result<(), Box<Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error>> {
     /// # let data = Data {
     /// #   base: "".into(),
     /// #   client_id: "".into(),
@@ -737,7 +729,7 @@ impl<R: EventStream> EventReader<R> {
     }
 }
 
-impl<H: HttpSend> ops::Deref for Mastodon<H> {
+impl ops::Deref for Mastodon {
     type Target = Data;
 
     fn deref(&self) -> &Self::Target {
@@ -745,16 +737,14 @@ impl<H: HttpSend> ops::Deref for Mastodon<H> {
     }
 }
 
-struct MastodonBuilder<H: HttpSend> {
+struct MastodonBuilder {
     client: Option<Client>,
-    http_sender: H,
     data: Option<Data>,
 }
 
-impl<H: HttpSend> MastodonBuilder<H> {
-    pub fn new(sender: H) -> Self {
+impl MastodonBuilder {
+    pub fn new() -> Self {
         MastodonBuilder {
-            http_sender: sender,
             client: None,
             data: None,
         }
@@ -770,11 +760,10 @@ impl<H: HttpSend> MastodonBuilder<H> {
         self
     }
 
-    pub fn build(self) -> Result<Mastodon<H>> {
+    pub fn build(self) -> Result<Mastodon> {
         Ok(if let Some(data) = self.data {
             Mastodon {
                 client: self.client.unwrap_or_else(Client::new),
-                http_sender: self.http_sender,
                 data,
             }
         } else {
@@ -785,15 +774,14 @@ impl<H: HttpSend> MastodonBuilder<H> {
 
 /// Client that can make unauthenticated calls to a mastodon instance
 #[derive(Clone, Debug)]
-pub struct MastodonUnauth<H: HttpSend = HttpSender> {
+pub struct MastodonUnauth {
     client: Client,
-    http_sender: H,
     base: url::Url,
 }
 
-impl MastodonUnauth<HttpSender> {
+impl MastodonUnauth {
     /// Create a new unauthenticated client
-    pub fn new(base: &str) -> Result<MastodonUnauth<HttpSender>> {
+    pub fn new(base: &str) -> Result<MastodonUnauth> {
         let base = if base.starts_with("https://") {
             base.to_string()
         } else {
@@ -801,19 +789,19 @@ impl MastodonUnauth<HttpSender> {
         };
         Ok(MastodonUnauth {
             client: Client::new(),
-            http_sender: HttpSender,
             base: url::Url::parse(&base)?,
         })
     }
 }
 
-impl<H: HttpSend> MastodonUnauth<H> {
+impl MastodonUnauth {
     fn route(&self, url: &str) -> Result<url::Url> {
         Ok(self.base.join(url)?)
     }
 
     fn send(&self, req: RequestBuilder) -> Result<Response> {
-        Ok(self.http_sender.send(&self.client, req)?)
+        let req = req.build()?;
+        Ok(self.client.execute(req)?)
     }
 
     /// Get a stream of the public timeline
@@ -835,7 +823,7 @@ impl<H: HttpSend> MastodonUnauth<H> {
     }
 }
 
-impl<H: HttpSend> MastodonUnauthenticated<H> for MastodonUnauth<H> {
+impl MastodonUnauthenticated for MastodonUnauth {
     /// GET /api/v1/statuses/:id
     fn get_status(&self, id: &str) -> Result<Status> {
         let route = self.route("/api/v1/statuses")?;

@@ -90,7 +90,7 @@ impl Scopes {
     /// # use std::error::Error;
     /// use elefren::scopes::Scopes;
     ///
-    /// # fn main() -> Result<(), Box<Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let scope = Scopes::all();
     /// assert_eq!(&format!("{}", scope), "read write follow push");
     /// #   Ok(())
@@ -107,7 +107,7 @@ impl Scopes {
     /// # use std::error::Error;
     /// use elefren::scopes::Scopes;
     ///
-    /// # fn main() -> Result<(), Box<Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let scope = Scopes::read_all();
     /// assert_eq!(&format!("{}", scope), "read");
     /// #   Ok(())
@@ -124,7 +124,7 @@ impl Scopes {
     /// # use std::error::Error;
     /// use elefren::scopes::{Read, Scopes};
     ///
-    /// # fn main() -> Result<(), Box<Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let scope = Scopes::read(Read::Accounts);
     /// assert_eq!(&format!("{}", scope), "read:accounts");
     /// #   Ok(())
@@ -141,7 +141,7 @@ impl Scopes {
     /// # use std::error::Error;
     /// use elefren::scopes::Scopes;
     ///
-    /// # fn main() -> Result<(), Box<Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let scope = Scopes::write_all();
     /// assert_eq!(&format!("{}", scope), "write");
     /// #   Ok(())
@@ -158,7 +158,7 @@ impl Scopes {
     /// # use std::error::Error;
     /// use elefren::scopes::{Scopes, Write};
     ///
-    /// # fn main() -> Result<(), Box<Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let scope = Scopes::write(Write::Accounts);
     /// assert_eq!(&format!("{}", scope), "write:accounts");
     /// #   Ok(())
@@ -175,7 +175,7 @@ impl Scopes {
     /// # use std::error::Error;
     /// use elefren::scopes::Scopes;
     ///
-    /// # fn main() -> Result<(), Box<Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let scope = Scopes::follow();
     /// assert_eq!(&format!("{}", scope), "follow");
     /// #   Ok(())
@@ -192,7 +192,7 @@ impl Scopes {
     /// # use std::error::Error;
     /// use elefren::scopes::Scopes;
     ///
-    /// # fn main() -> Result<(), Box<Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let scope = Scopes::push();
     /// assert_eq!(&format!("{}", scope), "push");
     /// #   Ok(())

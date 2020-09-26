@@ -3,7 +3,6 @@ use std::borrow::Cow;
 use crate::{
     entities::prelude::*,
     errors::Result,
-    http_send::{HttpSend, HttpSender},
     media_builder::MediaBuilder,
     page::Page,
     requests::{
@@ -19,60 +18,60 @@ use crate::{
 /// Represents the set of methods that a Mastodon Client can do, so that
 /// implementations might be swapped out for testing
 #[allow(unused)]
-pub trait MastodonClient<H: HttpSend = HttpSender> {
+pub trait MastodonClient {
     /// Type that wraps streaming API streams
     type Stream: Iterator<Item = Event>;
 
     /// GET /api/v1/favourites
-    fn favourites(&self) -> Result<Page<Status, H>> {
+    fn favourites(&self) -> Result<Page<Status>> {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/blocks
-    fn blocks(&self) -> Result<Page<Account, H>> {
+    fn blocks(&self) -> Result<Page<Account>> {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/domain_blocks
-    fn domain_blocks(&self) -> Result<Page<String, H>> {
+    fn domain_blocks(&self) -> Result<Page<String>> {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/follow_requests
-    fn follow_requests(&self) -> Result<Page<Account, H>> {
+    fn follow_requests(&self) -> Result<Page<Account>> {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/timelines/home
-    fn get_home_timeline(&self) -> Result<Page<Status, H>> {
+    fn get_home_timeline(&self) -> Result<Page<Status>> {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/custom_emojis
-    fn get_emojis(&self) -> Result<Page<Emoji, H>> {
+    fn get_emojis(&self) -> Result<Page<Emoji>> {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/mutes
-    fn mutes(&self) -> Result<Page<Account, H>> {
+    fn mutes(&self) -> Result<Page<Account>> {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/notifications
-    fn notifications(&self) -> Result<Page<Notification, H>> {
+    fn notifications(&self) -> Result<Page<Notification>> {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/reports
-    fn reports(&self) -> Result<Page<Report, H>> {
+    fn reports(&self) -> Result<Page<Report>> {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/accounts/:id/followers
-    fn followers(&self, id: &str) -> Result<Page<Account, H>> {
+    fn followers(&self, id: &str) -> Result<Page<Account>> {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/accounts/:id/following
-    fn following(&self, id: &str) -> Result<Page<Account, H>> {
+    fn following(&self, id: &str) -> Result<Page<Account>> {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/statuses/:id/reblogged_by
-    fn reblogged_by(&self, id: &str) -> Result<Page<Account, H>> {
+    fn reblogged_by(&self, id: &str) -> Result<Page<Account>> {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/statuses/:id/favourited_by
-    fn favourited_by(&self, id: &str) -> Result<Page<Account, H>> {
+    fn favourited_by(&self, id: &str) -> Result<Page<Account>> {
         unimplemented!("This method was not implemented");
     }
     /// DELETE /api/v1/domain_blocks
@@ -200,26 +199,26 @@ pub trait MastodonClient<H: HttpSend = HttpSender> {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/timelines/public?local=true
-    fn get_local_timeline(&self) -> Result<Page<Status, H>> {
+    fn get_local_timeline(&self) -> Result<Page<Status>> {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/timelines/public?local=false
-    fn get_federated_timeline(&self) -> Result<Page<Status, H>> {
+    fn get_federated_timeline(&self) -> Result<Page<Status>> {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/timelines/tag/:hashtag
-    fn get_hashtag_timeline(&self, hashtag: &str, local: bool) -> Result<Page<Status, H>> {
+    fn get_hashtag_timeline(&self, hashtag: &str, local: bool) -> Result<Page<Status>> {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/accounts/:id/statuses
-    fn statuses<'a, 'b: 'a, S>(&'b self, id: &'b str, request: S) -> Result<Page<Status, H>>
+    fn statuses<'a, 'b: 'a, S>(&'b self, id: &'b str, request: S) -> Result<Page<Status>>
     where
         S: Into<Option<StatusesRequest<'a>>>,
     {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/accounts/relationships
-    fn relationships(&self, ids: &[&str]) -> Result<Page<Relationship, H>> {
+    fn relationships(&self, ids: &[&str]) -> Result<Page<Relationship>> {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/accounts/search?q=:query&limit=:limit&following=:following
@@ -228,7 +227,7 @@ pub trait MastodonClient<H: HttpSend = HttpSender> {
         query: &str,
         limit: Option<u64>,
         following: bool,
-    ) -> Result<Page<Account, H>> {
+    ) -> Result<Page<Account>> {
         unimplemented!("This method was not implemented");
     }
     /// POST /api/v1/push/subscription
@@ -276,7 +275,7 @@ pub trait MastodonClient<H: HttpSend = HttpSender> {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/endorsements
-    fn get_endorsements(&self) -> Result<Page<Account, H>> {
+    fn get_endorsements(&self) -> Result<Page<Account>> {
         unimplemented!("This method was not implemented");
     }
     /// POST /api/v1/accounts/:id/pin
@@ -293,7 +292,7 @@ pub trait MastodonClient<H: HttpSend = HttpSender> {
     /// # extern crate elefren;
     /// # use std::error::Error;
     /// # use elefren::prelude::*;
-    /// # fn main() -> Result<(), Box<Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error>> {
     /// # let data = Data {
     /// #   base: "".into(),
     /// #   client_id: "".into(),
@@ -305,7 +304,7 @@ pub trait MastodonClient<H: HttpSend = HttpSender> {
     /// let follows_me = client.follows_me()?;
     /// #   Ok(())
     /// # }
-    fn follows_me(&self) -> Result<Page<Account, H>> {
+    fn follows_me(&self) -> Result<Page<Account>> {
         unimplemented!("This method was not implemented");
     }
     /// Shortcut for
@@ -315,7 +314,7 @@ pub trait MastodonClient<H: HttpSend = HttpSender> {
     /// # extern crate elefren;
     /// # use std::error::Error;
     /// # use elefren::prelude::*;
-    /// # fn main() -> Result<(), Box<Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error>> {
     /// # let data = Data {
     /// #   base: "".into(),
     /// #   client_id: "".into(),
@@ -327,7 +326,7 @@ pub trait MastodonClient<H: HttpSend = HttpSender> {
     /// let follows_me = client.followed_by_me()?;
     /// #   Ok(())
     /// # }
-    fn followed_by_me(&self) -> Result<Page<Account, H>> {
+    fn followed_by_me(&self) -> Result<Page<Account>> {
         unimplemented!("This method was not implemented");
     }
 
@@ -371,7 +370,7 @@ pub trait MastodonClient<H: HttpSend = HttpSender> {
 /// Trait that represents clients that can make unauthenticated calls to a
 /// mastodon instance
 #[allow(unused)]
-pub trait MastodonUnauthenticated<H: HttpSend> {
+pub trait MastodonUnauthenticated {
     /// GET /api/v1/statuses/:id
     fn get_status(&self, id: &str) -> Result<Status> {
         unimplemented!("This method was not implemented");
@@ -385,11 +384,11 @@ pub trait MastodonUnauthenticated<H: HttpSend> {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/statuses/:id/reblogged_by
-    fn reblogged_by(&self, id: &str) -> Result<Page<Account, H>> {
+    fn reblogged_by(&self, id: &str) -> Result<Page<Account>> {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/statuses/:id/favourited_by
-    fn favourited_by(&self, id: &str) -> Result<Page<Account, H>> {
+    fn favourited_by(&self, id: &str) -> Result<Page<Account>> {
         unimplemented!("This method was not implemented");
     }
 }

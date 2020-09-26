@@ -10,7 +10,7 @@ use std::time::Duration;
 /// # extern crate elefren;
 /// # use std::error::Error;
 /// use elefren::{entities::filter::FilterContext, requests::AddFilterRequest};
-/// # fn main() -> Result<(), Box<Error>> {
+/// # fn main() -> Result<(), Box<dyn Error>> {
 /// let request = AddFilterRequest::new("foo", FilterContext::Home);
 /// #   Ok(())
 /// # }

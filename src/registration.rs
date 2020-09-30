@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use reqwest::blocking::{Client, RequestBuilder, Response};
+use reqwest::{Client, RequestBuilder, Response};
 use serde::Deserialize;
 use std::convert::TryInto;
 
@@ -99,7 +99,8 @@ impl<'a> Registration<'a> {
 
     fn send(&self, req: RequestBuilder) -> Result<Response> {
         let req = req.build()?;
-        Ok(self.client.execute(req)?)
+        let handle = tokio::runtime::Handle::current();
+        Ok(handle.block_on(self.client.execute(req))?)
     }
 
     /// Register the given application
@@ -178,7 +179,8 @@ impl<'a> Registration<'a> {
 
     fn send_app(&self, app: &App) -> Result<OAuth> {
         let url = format!("{}/api/v1/apps", self.base);
-        Ok(self.send(self.client.post(&url).json(&app))?.json()?)
+        let handle = tokio::runtime::Handle::current();
+        Ok(handle.block_on(self.send(self.client.post(&url).json(&app))?.json())?)
     }
 }
 
@@ -234,7 +236,8 @@ impl Registered {
 impl Registered {
     fn send(&self, req: RequestBuilder) -> Result<Response> {
         let req = req.build()?;
-        Ok(self.client.execute(req)?)
+        let handle = tokio::runtime::Handle::current();
+        Ok(handle.block_on(self.client.execute(req))?)
     }
 
     /// Returns the parts of the `Registered` struct that can be used to
@@ -309,7 +312,8 @@ impl Registered {
             self.base, self.client_id, self.client_secret, code, self.redirect
         );
 
-        let token: AccessToken = self.send(self.client.post(&url))?.json()?;
+        let handle = tokio::runtime::Handle::current();
+        let token: AccessToken = handle.block_on(self.send(self.client.post(&url))?.json())?;
 
         let data = Data {
             base: self.base.clone().into(),

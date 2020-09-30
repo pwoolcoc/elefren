@@ -18,6 +18,7 @@ use crate::{
 /// Represents the set of methods that a Mastodon Client can do, so that
 /// implementations might be swapped out for testing
 #[allow(unused)]
+#[async_trait::async_trait]
 pub trait MastodonClient {
     /// Type that wraps streaming API streams
     type Stream: Iterator<Item = Event>;

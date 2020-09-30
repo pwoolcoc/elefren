@@ -4,11 +4,11 @@ macro_rules! methods {
             fn $method<T: for<'de> serde::Deserialize<'de>>(&self, url: String)
             -> Result<T>
             {
-                let response = self.send(
+                let response = self.send_blocking(
                         self.client.$method(&url)
                 )?;
 
-                deserialise(response)
+                deserialise_blocking(response)
             }
          )+
     };
@@ -42,7 +42,7 @@ macro_rules! paged_routes {
             ),
             fn $name(&self) -> Result<Page<$ret>> {
                 let url = self.route(concat!("/api/v1/", $url));
-                let response = self.send(
+                let response = self.send_blocking(
                         self.client.$method(&url)
                 )?;
 
@@ -88,7 +88,7 @@ macro_rules! paged_routes {
 
                 let url = format!(concat!("/api/v1/", $url, "?{}"), &qs);
 
-                let response = self.send(
+                let response = self.send_blocking(
                         self.client.get(&url)
                 )?;
 
@@ -199,7 +199,7 @@ macro_rules! route {
                     )*
                 });
 
-                let response = self.send(
+                let response = self.send_blocking(
                         self.client.$method(&self.route(concat!("/api/v1/", $url)))
                             .json(&form_data)
                 )?;
@@ -212,7 +212,7 @@ macro_rules! route {
                     return Err(Error::Server(status));
                 }
 
-                deserialise(response)
+                deserialise_blocking(response)
             }
         }
 
@@ -317,7 +317,7 @@ macro_rules! paged_routes_with_id {
             ),
             fn $name(&self, id: &str) -> Result<Page<$ret>> {
                 let url = self.route(&format!(concat!("/api/v1/", $url), id));
-                let response = self.send(
+                let response = self.send_blocking(
                         self.client.$method(&url)
                 )?;
 

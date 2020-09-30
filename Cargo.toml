@@ -25,6 +25,8 @@ url = "2.1.1"
 tap-reader = "1"
 toml = { version = "0.5.0", optional = true }
 tungstenite = "0.11.0"
+async-trait = "0.1.40"
+tokio = "0.2.22"
 
 [dependencies.chrono]
 version = "0.4"

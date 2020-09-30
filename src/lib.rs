@@ -73,11 +73,12 @@
 
 use std::{borrow::Cow, io::BufRead, ops};
 
-use reqwest::blocking::{Client, RequestBuilder, Response};
-use tap_reader::Tap;
+use reqwest::{Client, RequestBuilder, Response};
 use tungstenite::client::AutoStream;
 
 use crate::{entities::prelude::*, page::Page};
+
+pub use isolang::Language;
 
 pub use crate::{
     data::Data,
@@ -94,7 +95,6 @@ pub use crate::{
     },
     status_builder::{NewStatus, StatusBuilder},
 };
-pub use isolang::Language;
 
 /// Registering your App
 pub mod apps;
@@ -150,9 +150,10 @@ impl Mastodon {
         format!("{}{}", self.base, url)
     }
 
-    pub(crate) fn send(&self, req: RequestBuilder) -> Result<Response> {
+    pub(crate) fn send_blocking(&self, req: RequestBuilder) -> Result<Response> {
         let request = req.bearer_auth(&self.token).build()?;
-        Ok(self.client.execute(request)?)
+        let handle = tokio::runtime::Handle::current();
+        Ok(handle.block_on(self.client.execute(request))?)
     }
 }
 
@@ -167,6 +168,7 @@ impl From<Data> for Mastodon {
     }
 }
 
+#[async_trait::async_trait]
 impl MastodonClient for Mastodon {
     type Stream = EventReader<WebSocket>;
 
@@ -241,7 +243,7 @@ impl MastodonClient for Mastodon {
 
     fn add_filter(&self, request: &mut AddFilterRequest) -> Result<Filter> {
         let url = self.route("/api/v1/filters");
-        let response = self.send(self.client.post(&url).json(&request))?;
+        let response = self.send_blocking(self.client.post(&url).json(&request))?;
 
         let status = response.status();
 
@@ -251,13 +253,13 @@ impl MastodonClient for Mastodon {
             return Err(Error::Server(status));
         }
 
-        deserialise(response)
+        deserialise_blocking(response)
     }
 
     /// PUT /api/v1/filters/:id
     fn update_filter(&self, id: &str, request: &mut AddFilterRequest) -> Result<Filter> {
         let url = self.route(&format!("/api/v1/filters/{}", id));
-        let response = self.send(self.client.put(&url).json(&request))?;
+        let response = self.send_blocking(self.client.put(&url).json(&request))?;
 
         let status = response.status();
 
@@ -267,13 +269,13 @@ impl MastodonClient for Mastodon {
             return Err(Error::Server(status));
         }
 
-        deserialise(response)
+        deserialise_blocking(response)
     }
 
     fn update_credentials(&self, builder: &mut UpdateCredsRequest) -> Result<Account> {
         let changes = builder.build()?;
         let url = self.route("/api/v1/accounts/update_credentials");
-        let response = self.send(self.client.patch(&url).json(&changes))?;
+        let response = self.send_blocking(self.client.patch(&url).json(&changes))?;
 
         let status = response.status();
 
@@ -283,18 +285,18 @@ impl MastodonClient for Mastodon {
             return Err(Error::Server(status));
         }
 
-        deserialise(response)
+        deserialise_blocking(response)
     }
 
     /// Post a new status to the account.
     fn new_status(&self, status: NewStatus) -> Result<Status> {
-        let response = self.send(
+        let response = self.send_blocking(
             self.client
                 .post(&self.route("/api/v1/statuses"))
                 .json(&status),
         )?;
 
-        deserialise(response)
+        deserialise_blocking(response)
     }
 
     /// Get timeline filtered by a hashtag(eg. `#coffee`) either locally or
@@ -307,7 +309,7 @@ impl MastodonClient for Mastodon {
             self.route(&format!("{}{}", base, hashtag))
         };
 
-        Page::new(self, self.send(self.client.get(&url))?)
+        Page::new(self, self.send_blocking(self.client.get(&url))?)
     }
 
     /// Get statuses of a single account by id. Optionally only with pictures
@@ -362,7 +364,7 @@ impl MastodonClient for Mastodon {
             url = format!("{}{}", url, request.to_querystring()?);
         }
 
-        let response = self.send(self.client.get(&url))?;
+        let response = self.send_blocking(self.client.get(&url))?;
 
         Page::new(self, response)
     }
@@ -384,7 +386,7 @@ impl MastodonClient for Mastodon {
             url.pop();
         }
 
-        let response = self.send(self.client.get(&url))?;
+        let response = self.send_blocking(self.client.get(&url))?;
 
         Page::new(self, response)
     }
@@ -392,26 +394,26 @@ impl MastodonClient for Mastodon {
     /// Add a push notifications subscription
     fn add_push_subscription(&self, request: &AddPushRequest) -> Result<Subscription> {
         let request = request.build()?;
-        let response = self.send(
+        let response = self.send_blocking(
             self.client
                 .post(&self.route("/api/v1/push/subscription"))
                 .json(&request),
         )?;
 
-        deserialise(response)
+        deserialise_blocking(response)
     }
 
     /// Update the `data` portion of the push subscription associated with this
     /// access token
     fn update_push_data(&self, request: &UpdatePushRequest) -> Result<Subscription> {
         let request = request.build();
-        let response = self.send(
+        let response = self.send_blocking(
             self.client
                 .put(&self.route("/api/v1/push/subscription"))
                 .json(&request),
         )?;
 
-        deserialise(response)
+        deserialise_blocking(response)
     }
 
     /// Get all accounts that follow the authenticated user
@@ -621,9 +623,14 @@ impl MastodonClient for Mastodon {
 
     /// Equivalent to /api/v1/media
     fn media(&self, media_builder: MediaBuilder) -> Result<Attachment> {
-        use reqwest::blocking::multipart::Form;
+        use reqwest::multipart::{Form, Part};
+        use std::{fs::File, io::Read};
 
-        let mut form_data = Form::new().file("file", media_builder.file.as_ref())?;
+        let mut f = File::open(media_builder.file.as_ref())?;
+        let mut bytes = Vec::new();
+        f.read_to_end(&mut bytes)?;
+        let part = Part::stream(bytes);
+        let mut form_data = Form::new().part("file", part);
 
         if let Some(description) = media_builder.description {
             form_data = form_data.text("description", description);
@@ -634,7 +641,7 @@ impl MastodonClient for Mastodon {
             form_data = form_data.text("focus", string);
         }
 
-        let response = self.send(
+        let response = self.send_blocking(
             self.client
                 .post(&self.route("/api/v1/media"))
                 .multipart(form_data),
@@ -648,7 +655,7 @@ impl MastodonClient for Mastodon {
             return Err(Error::Server(status));
         }
 
-        deserialise(response)
+        deserialise_blocking(response)
     }
 }
 
@@ -820,9 +827,10 @@ impl MastodonUnauth {
         Ok(self.base.join(url)?)
     }
 
-    fn send(&self, req: RequestBuilder) -> Result<Response> {
+    fn send_blocking(&self, req: RequestBuilder) -> Result<Response> {
         let req = req.build()?;
-        Ok(self.client.execute(req)?)
+        let handle = tokio::runtime::Handle::current();
+        Ok(handle.block_on(self.client.execute(req))?)
     }
 
     /// Get a stream of the public timeline
@@ -852,8 +860,8 @@ impl MastodonUnauthenticated for MastodonUnauth {
     fn get_status(&self, id: &str) -> Result<Status> {
         let route = self.route("/api/v1/statuses")?;
         let route = route.join(id)?;
-        let response = self.send(self.client.get(route))?;
-        deserialise(response)
+        let response = self.send_blocking(self.client.get(route))?;
+        deserialise_blocking(response)
     }
 
     /// GET /api/v1/statuses/:id/context
@@ -861,8 +869,8 @@ impl MastodonUnauthenticated for MastodonUnauth {
         let route = self.route("/api/v1/statuses")?;
         let route = route.join(id)?;
         let route = route.join("context")?;
-        let response = self.send(self.client.get(route))?;
-        deserialise(response)
+        let response = self.send_blocking(self.client.get(route))?;
+        deserialise_blocking(response)
     }
 
     /// GET /api/v1/statuses/:id/card
@@ -870,26 +878,28 @@ impl MastodonUnauthenticated for MastodonUnauth {
         let route = self.route("/api/v1/statuses")?;
         let route = route.join(id)?;
         let route = route.join("card")?;
-        let response = self.send(self.client.get(route))?;
-        deserialise(response)
+        let response = self.send_blocking(self.client.get(route))?;
+        deserialise_blocking(response)
     }
 }
 
 // Convert the HTTP response body from JSON. Pass up deserialization errors
 // transparently.
-fn deserialise<T: for<'de> serde::Deserialize<'de>>(response: Response) -> Result<T> {
-    let mut reader = Tap::new(response);
+fn deserialise_blocking<T: for<'de> serde::Deserialize<'de>>(response: Response) -> Result<T> {
+    let handle = tokio::runtime::Handle::current();
 
-    match serde_json::from_reader(&mut reader) {
+    let bytes = handle.block_on(response.bytes())?;
+
+    match serde_json::from_slice(&bytes) {
         Ok(t) => {
-            log::debug!("{}", String::from_utf8_lossy(&reader.bytes));
+            log::debug!("{}", String::from_utf8_lossy(&bytes));
             Ok(t)
         },
         // If deserializing into the desired type fails try again to
         // see if this is an error response.
         Err(e) => {
-            log::error!("{}", String::from_utf8_lossy(&reader.bytes));
-            if let Ok(error) = serde_json::from_slice(&reader.bytes) {
+            log::error!("{}", String::from_utf8_lossy(&bytes));
+            if let Ok(error) = serde_json::from_slice(&bytes) {
                 return Err(Error::Api(error));
             }
             Err(e.into())

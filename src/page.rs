@@ -1,7 +1,7 @@
-use super::{deserialise, Mastodon, Result};
+use super::{deserialise_blocking, Mastodon, Result};
 use crate::entities::itemsiter::ItemsIter;
 use hyper_old_types::header::{parsing, Link, RelationType};
-use reqwest::{blocking::Response, header::LINK};
+use reqwest::{header::LINK, Response};
 use serde::Deserialize;
 use url::Url;
 
@@ -17,7 +17,7 @@ macro_rules! pages {
                     None => return Ok(None),
                 };
 
-                let response = self.mastodon.send(
+                let response = self.mastodon.send_blocking(
                     self.mastodon.client.get(url)
                 )?;
 
@@ -25,7 +25,7 @@ macro_rules! pages {
                 self.next = next;
                 self.prev = prev;
 
-                deserialise(response)
+                deserialise_blocking(response)
             });
          )*
     }
@@ -110,7 +110,7 @@ impl<'a, T: for<'de> Deserialize<'de>> Page<'a, T> {
     pub(crate) fn new(mastodon: &'a Mastodon, response: Response) -> Result<Self> {
         let (prev, next) = get_links(&response)?;
         Ok(Page {
-            initial_items: deserialise(response)?,
+            initial_items: deserialise_blocking(response)?,
             next,
             prev,
             mastodon,

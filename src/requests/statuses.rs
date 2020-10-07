@@ -412,230 +412,143 @@ mod tests {
     #[test]
     fn test_to_querystring() {
         macro_rules! qs_test {
-            (|$r:ident| $b:block, $expected:expr) => {
-                {
-                    let $r = StatusesRequest::new();
-                    let $r = $b;
-                    let qs = $r.to_querystring().expect("Failed to serialize querystring");
-                    assert_eq!(&qs, $expected);
-                }
-            }
+            (| $r:ident | $b:block, $expected:expr) => {{
+                let $r = StatusesRequest::new();
+                let $r = $b;
+                let qs = $r
+                    .to_querystring()
+                    .expect("Failed to serialize querystring");
+                assert_eq!(&qs, $expected);
+            }};
         }
 
+        qs_test!(|request| { request.only_media() }, "?only_media=1");
         qs_test!(
-            |request| {
-                request.only_media()
-            },
-            "?only_media=1"
-        );
-        qs_test!(
-            |request| {
-                request.exclude_replies()
-            },
+            |request| { request.exclude_replies() },
             "?exclude_replies=1"
         );
+        qs_test!(|request| { request.pinned() }, "?pinned=1");
+        qs_test!(|request| { request.max_id("foo") }, "?max_id=foo");
+        qs_test!(|request| { request.since_id("foo") }, "?since_id=foo");
+        qs_test!(|request| { request.limit(42) }, "?limit=42");
         qs_test!(
-            |request| {
-                request.pinned()
-            },
-            "?pinned=1"
-        );
-        qs_test!(
-            |request| {
-                request.max_id("foo")
-            },
-            "?max_id=foo"
-        );
-        qs_test!(
-            |request| {
-                request.since_id("foo")
-            },
-            "?since_id=foo"
-        );
-        qs_test!(
-            |request| {
-                request.limit(42)
-            },
-            "?limit=42"
-        );
-        qs_test!(
-            |request| {
-                request.only_media().exclude_replies()
-            },
+            |request| { request.only_media().exclude_replies() },
             "?only_media=1&exclude_replies=1"
         );
         qs_test!(
-            |request| {
-                request.only_media().pinned()
-            },
+            |request| { request.only_media().pinned() },
             "?only_media=1&pinned=1"
         );
         qs_test!(
-            |request| {
-                request.only_media().max_id("foo")
-            },
+            |request| { request.only_media().max_id("foo") },
             "?only_media=1&max_id=foo"
         );
         qs_test!(
-            |request| {
-                request.only_media().since_id("foo")
-            },
+            |request| { request.only_media().since_id("foo") },
             "?only_media=1&since_id=foo"
         );
         qs_test!(
-            |request| {
-                request.only_media().limit(42)
-            },
+            |request| { request.only_media().limit(42) },
             "?only_media=1&limit=42"
         );
         qs_test!(
-            |request| {
-                request.exclude_replies().only_media()
-            },
+            |request| { request.exclude_replies().only_media() },
             "?only_media=1&exclude_replies=1"
         );
         qs_test!(
-            |request| {
-                request.exclude_replies().pinned()
-            },
+            |request| { request.exclude_replies().pinned() },
             "?exclude_replies=1&pinned=1"
         );
         qs_test!(
-            |request| {
-                request.exclude_replies().max_id("foo")
-            },
+            |request| { request.exclude_replies().max_id("foo") },
             "?exclude_replies=1&max_id=foo"
         );
         qs_test!(
-            |request| {
-                request.exclude_replies().since_id("foo")
-            },
+            |request| { request.exclude_replies().since_id("foo") },
             "?exclude_replies=1&since_id=foo"
         );
         qs_test!(
-            |request| {
-                request.exclude_replies().limit(42)
-            },
+            |request| { request.exclude_replies().limit(42) },
             "?exclude_replies=1&limit=42"
         );
         qs_test!(
-            |request| {
-                request.pinned().only_media()
-            },
+            |request| { request.pinned().only_media() },
             "?only_media=1&pinned=1"
         );
         qs_test!(
-            |request| {
-                request.pinned().exclude_replies()
-            },
+            |request| { request.pinned().exclude_replies() },
             "?exclude_replies=1&pinned=1"
         );
         qs_test!(
-            |request| {
-                request.pinned().max_id("foo")
-            },
+            |request| { request.pinned().max_id("foo") },
             "?pinned=1&max_id=foo"
         );
         qs_test!(
-            |request| {
-                request.pinned().since_id("foo")
-            },
+            |request| { request.pinned().since_id("foo") },
             "?pinned=1&since_id=foo"
         );
         qs_test!(
-            |request| {
-                request.pinned().limit(42)
-            },
+            |request| { request.pinned().limit(42) },
             "?pinned=1&limit=42"
         );
         qs_test!(
-            |request| {
-                request.max_id("foo").only_media()
-            },
+            |request| { request.max_id("foo").only_media() },
             "?only_media=1&max_id=foo"
         );
         qs_test!(
-            |request| {
-                request.max_id("foo").exclude_replies()
-            },
+            |request| { request.max_id("foo").exclude_replies() },
             "?exclude_replies=1&max_id=foo"
         );
         qs_test!(
-            |request| {
-                request.max_id("foo").pinned()
-            },
+            |request| { request.max_id("foo").pinned() },
             "?pinned=1&max_id=foo"
         );
         qs_test!(
-            |request| {
-                request.max_id("foo").since_id("foo")
-            },
+            |request| { request.max_id("foo").since_id("foo") },
             "?max_id=foo&since_id=foo"
         );
         qs_test!(
-            |request| {
-                request.max_id("foo").limit(42)
-            },
+            |request| { request.max_id("foo").limit(42) },
             "?max_id=foo&limit=42"
         );
         qs_test!(
-            |request| {
-                request.since_id("foo").only_media()
-            },
+            |request| { request.since_id("foo").only_media() },
             "?only_media=1&since_id=foo"
         );
         qs_test!(
-            |request| {
-                request.since_id("foo").exclude_replies()
-            },
+            |request| { request.since_id("foo").exclude_replies() },
             "?exclude_replies=1&since_id=foo"
         );
         qs_test!(
-            |request| {
-                request.since_id("foo").pinned()
-            },
+            |request| { request.since_id("foo").pinned() },
             "?pinned=1&since_id=foo"
         );
         qs_test!(
-            |request| {
-                request.since_id("foo").max_id("foo")
-            },
+            |request| { request.since_id("foo").max_id("foo") },
             "?max_id=foo&since_id=foo"
         );
         qs_test!(
-            |request| {
-                request.since_id("foo").limit(42)
-            },
+            |request| { request.since_id("foo").limit(42) },
             "?since_id=foo&limit=42"
         );
         qs_test!(
-            |request| {
-                request.limit(42).only_media()
-            },
+            |request| { request.limit(42).only_media() },
             "?only_media=1&limit=42"
         );
         qs_test!(
-            |request| {
-                request.limit(42).exclude_replies()
-            },
+            |request| { request.limit(42).exclude_replies() },
             "?exclude_replies=1&limit=42"
         );
         qs_test!(
-            |request| {
-                request.limit(42).pinned()
-            },
+            |request| { request.limit(42).pinned() },
             "?pinned=1&limit=42"
         );
         qs_test!(
-            |request| {
-                request.limit(42).max_id("foo")
-            },
+            |request| { request.limit(42).max_id("foo") },
             "?max_id=foo&limit=42"
         );
         qs_test!(
-            |request| {
-                request.limit(42).since_id("foo")
-            },
+            |request| { request.limit(42).since_id("foo") },
             "?since_id=foo&limit=42"
         );
     }

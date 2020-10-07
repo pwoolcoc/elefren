@@ -126,7 +126,8 @@ mod tests {
 
     #[test]
     fn test_expires_in() {
-        let request = AddFilterRequest::new("foo", FilterContext::Home).expires_in(Duration::from_secs(300));
+        let request =
+            AddFilterRequest::new("foo", FilterContext::Home).expires_in(Duration::from_secs(300));
         assert_eq!(
             request,
             AddFilterRequest {
@@ -141,7 +142,8 @@ mod tests {
 
     #[test]
     fn test_serialize_request() {
-        let request = AddFilterRequest::new("foo", FilterContext::Home).expires_in(Duration::from_secs(300));
+        let request =
+            AddFilterRequest::new("foo", FilterContext::Home).expires_in(Duration::from_secs(300));
         let ser = serde_json::to_string(&request).expect("Couldn't serialize");
         assert_eq!(
             ser,

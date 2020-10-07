@@ -27,6 +27,11 @@ toml = { version = "0.5.0", optional = true }
 tungstenite = "0.11.0"
 async-trait = "0.1.40"
 tokio = "0.2.22"
+async-h1 = { version = "2.1.2", optional = true }
+async-native-tls = { version = "0.3.3", optional = true }
+smol = { version = "1.2.2", optional = true }
+http-types = { version = "2.5.0", optional = true }
+async-mutex = { version = "1.4.0", optional = true }
 
 [dependencies.chrono]
 version = "0.4"
@@ -36,9 +41,10 @@ features = ["serde"]
 default = ["reqwest/default-tls"]
 json = []
 env = ["envy"]
-all = ["toml", "json", "env"]
+all = ["toml", "json", "env", "async"]
 rustls-tls = ["reqwest/rustls-tls"]
 nightly = []
+async = ["async-h1", "async-native-tls", "smol", "http-types", "async-mutex"]
 
 [dev-dependencies]
 tempfile = "3.0.3"

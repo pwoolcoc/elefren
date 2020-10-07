@@ -195,7 +195,7 @@ impl UpdateCredsRequest {
                 privacy: self.privacy,
                 sensitive: self.sensitive,
             }),
-            fields_attributes: self.field_attributes.clone(),
+            fields_attributes: self.field_attributes,
         })
     }
 }
@@ -305,7 +305,9 @@ mod tests {
 
     #[test]
     fn test_update_creds_request_build() {
-        let builder = UpdateCredsRequest::new().display_name("test").note("a note");
+        let builder = UpdateCredsRequest::new()
+            .display_name("test")
+            .note("a note");
         let creds = builder.build().expect("Couldn't build Credentials");
         assert_eq!(
             creds,

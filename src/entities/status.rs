@@ -2,11 +2,8 @@
 
 use super::prelude::*;
 use crate::{
-    entities::{
-        card::Card,
-        poll::Poll,
-    },
-    status_builder::Visibility
+    entities::{card::Card, poll::Poll},
+    status_builder::Visibility,
 };
 use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -64,7 +61,10 @@ pub struct Status {
     pub card: Option<Card>,
     /// The detected language for the status, if detected.
     pub language: Option<String>,
-    /// Plain-text source of a status. Returned instead of content when status is deleted, so the user may redraft from the source text without the client having to reverse-engineer the original text from the HTML content.
+    /// Plain-text source of a status. Returned instead of content when status
+    /// is deleted, so the user may redraft from the source text without the
+    /// client having to reverse-engineer the original text from the HTML
+    /// content.
     pub text: Option<String>,
     /// Whether the application client has favourited the status.
     pub favourited: Option<bool>,

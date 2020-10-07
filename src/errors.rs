@@ -5,8 +5,12 @@ use std::{error, fmt, io::Error as IoError};
 use ::toml::de::Error as TomlDeError;
 #[cfg(feature = "toml")]
 use ::toml::ser::Error as TomlSerError;
+#[cfg(feature = "async")]
+use async_native_tls::Error as TlsError;
 #[cfg(feature = "env")]
 use envy::Error as EnvyError;
+#[cfg(feature = "async")]
+use http_types::Error as HttpTypesError;
 use hyper_old_types::Error as HeaderParseError;
 use reqwest::{header::ToStrError as HeaderStrError, Error as HttpError, StatusCode};
 use serde_json::Error as SerdeError;
@@ -64,6 +68,12 @@ pub enum Error {
     SerdeQs(SerdeQsError),
     /// WebSocket error
     WebSocket(WebSocketError),
+    #[cfg(feature = "async")]
+    /// http-types error
+    HttpTypes(HttpTypesError),
+    #[cfg(feature = "async")]
+    /// TLS error
+    Tls(TlsError),
     /// Other errors
     Other(String),
 }
@@ -99,6 +109,10 @@ impl error::Error for Error {
             Error::ClientSecretRequired => return None,
             Error::AccessTokenRequired => return None,
             Error::MissingField(_) => return None,
+            #[cfg(feature = "async")]
+            Error::HttpTypes(..) => return None,
+            #[cfg(feature = "async")]
+            Error::Tls(ref e) => e,
             Error::Other(..) => return None,
         })
     }
@@ -149,6 +163,8 @@ from! {
     #[cfg(feature = "env")] EnvyError, Envy,
     SerdeQsError, SerdeQs,
     WebSocketError, WebSocket,
+    #[cfg(feature = "async")] HttpTypesError, HttpTypes,
+    #[cfg(feature = "async")] TlsError, Tls,
     String, Other,
 }
 

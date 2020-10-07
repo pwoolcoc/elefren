@@ -38,19 +38,19 @@ impl AddFilterRequest {
     }
 
     /// Set `irreversible` to `true`
-    pub fn irreversible(&mut self) -> &mut Self {
+    pub fn irreversible(mut self) -> Self {
         self.irreversible = Some(true);
         self
     }
 
     /// Set `whole_word` to `true`
-    pub fn whole_word(&mut self) -> &mut Self {
+    pub fn whole_word(mut self) -> Self {
         self.whole_word = Some(true);
         self
     }
 
     /// Set `expires_in` to a duration
-    pub fn expires_in(&mut self, d: Duration) -> &mut Self {
+    pub fn expires_in(mut self, d: Duration) -> Self {
         self.expires_in = Some(d);
         self
     }
@@ -96,8 +96,7 @@ mod tests {
 
     #[test]
     fn test_irreversible() {
-        let mut request = AddFilterRequest::new("foo", FilterContext::Home);
-        request.irreversible();
+        let request = AddFilterRequest::new("foo", FilterContext::Home).irreversible();
         assert_eq!(
             request,
             AddFilterRequest {
@@ -112,8 +111,7 @@ mod tests {
 
     #[test]
     fn test_whole_word() {
-        let mut request = AddFilterRequest::new("foo", FilterContext::Home);
-        request.whole_word();
+        let request = AddFilterRequest::new("foo", FilterContext::Home).whole_word();
         assert_eq!(
             request,
             AddFilterRequest {
@@ -128,8 +126,7 @@ mod tests {
 
     #[test]
     fn test_expires_in() {
-        let mut request = AddFilterRequest::new("foo", FilterContext::Home);
-        request.expires_in(Duration::from_secs(300));
+        let request = AddFilterRequest::new("foo", FilterContext::Home).expires_in(Duration::from_secs(300));
         assert_eq!(
             request,
             AddFilterRequest {
@@ -144,8 +141,7 @@ mod tests {
 
     #[test]
     fn test_serialize_request() {
-        let mut request = AddFilterRequest::new("foo", FilterContext::Home);
-        request.expires_in(Duration::from_secs(300));
+        let request = AddFilterRequest::new("foo", FilterContext::Home).expires_in(Duration::from_secs(300));
         let ser = serde_json::to_string(&request).expect("Couldn't serialize");
         assert_eq!(
             ser,

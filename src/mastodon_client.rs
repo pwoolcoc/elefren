@@ -192,7 +192,7 @@ pub trait MastodonClient {
         unimplemented!("This method was not implemented");
     }
     /// PATCH /api/v1/accounts/update_credentials
-    fn update_credentials(&self, builder: &mut UpdateCredsRequest) -> Result<Account> {
+    fn update_credentials(&self, builder: UpdateCredsRequest) -> Result<Account> {
         unimplemented!("This method was not implemented");
     }
     /// POST /api/v1/statuses

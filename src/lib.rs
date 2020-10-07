@@ -98,6 +98,9 @@ pub use crate::{
 
 /// Registering your App
 pub mod apps;
+/// Async client
+#[cfg(feature = "async")]
+pub mod r#async;
 /// Contains the struct that holds the client auth data
 pub mod data;
 /// Entities returned from the API
@@ -272,7 +275,7 @@ impl MastodonClient for Mastodon {
         deserialise_blocking(response)
     }
 
-    fn update_credentials(&self, builder: &mut UpdateCredsRequest) -> Result<Account> {
+    fn update_credentials(&self, builder: UpdateCredsRequest) -> Result<Account> {
         let changes = builder.build()?;
         let url = self.route("/api/v1/accounts/update_credentials");
         let response = self.send_blocking(self.client.patch(&url).json(&changes))?;
@@ -348,8 +351,8 @@ impl MastodonClient for Mastodon {
     /// #   token: "".into(),
     /// # };
     /// let client = Mastodon::from(data);
-    /// let mut request = StatusesRequest::new();
-    /// request.only_media();
+    /// let request = StatusesRequest::new()
+    ///     .only_media();
     /// let statuses = client.statuses("user-id", request)?;
     /// # Ok(())
     /// # }

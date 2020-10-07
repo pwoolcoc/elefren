@@ -27,11 +27,10 @@ use crate::{
 /// use elefren::{prelude::*, status_builder::Visibility, UpdateCredsRequest};
 ///
 /// let client = Mastodon::from(data);
-/// let mut builder = UpdateCredsRequest::new();
+/// let builder = UpdateCredsRequest::new()
+///     .privacy(Visibility::Unlisted);
 ///
-/// builder.privacy(Visibility::Unlisted);
-///
-/// let result = client.update_credentials(&mut builder)?;
+/// let result = client.update_credentials(builder)?;
 /// #   Ok(())
 /// # }
 /// ```
@@ -75,7 +74,7 @@ impl UpdateCredsRequest {
     ///
     /// builder.display_name("my new display name");
     /// ```
-    pub fn display_name<D: Display>(&mut self, name: D) -> &mut Self {
+    pub fn display_name<D: Display>(mut self, name: D) -> Self {
         self.display_name = Some(name.to_string());
         self
     }
@@ -92,7 +91,7 @@ impl UpdateCredsRequest {
     ///
     /// builder.note("my new note");
     /// ```
-    pub fn note<D: Display>(&mut self, note: D) -> &mut Self {
+    pub fn note<D: Display>(mut self, note: D) -> Self {
         self.note = Some(note.to_string());
         self
     }
@@ -109,7 +108,7 @@ impl UpdateCredsRequest {
     ///
     /// builder.avatar("/path/to/my/new/avatar");
     /// ```
-    pub fn avatar<P: AsRef<Path>>(&mut self, path: P) -> &mut Self {
+    pub fn avatar<P: AsRef<Path>>(mut self, path: P) -> Self {
         let path = path.as_ref();
         let path = path.to_path_buf();
         self.avatar = Some(path);
@@ -128,7 +127,7 @@ impl UpdateCredsRequest {
     ///
     /// builder.header("/path/to/my/new/header");
     /// ```
-    pub fn header<P: AsRef<Path>>(&mut self, path: P) -> &mut Self {
+    pub fn header<P: AsRef<Path>>(mut self, path: P) -> Self {
         let path = path.as_ref();
         let path = path.to_path_buf();
         self.header = Some(path);
@@ -147,7 +146,7 @@ impl UpdateCredsRequest {
     ///
     /// builder.privacy(Visibility::Public);
     /// ```
-    pub fn privacy(&mut self, privacy: status_builder::Visibility) -> &mut Self {
+    pub fn privacy(mut self, privacy: status_builder::Visibility) -> Self {
         self.privacy = Some(privacy);
         self
     }
@@ -164,7 +163,7 @@ impl UpdateCredsRequest {
     ///
     /// builder.sensitive(true);
     /// ```
-    pub fn sensitive(&mut self, sensitive: bool) -> &mut Self {
+    pub fn sensitive(mut self, sensitive: bool) -> Self {
         self.sensitive = Some(sensitive);
         self
     }
@@ -181,12 +180,12 @@ impl UpdateCredsRequest {
     ///
     /// builder.field_attribute("some key", "some value");
     /// ```
-    pub fn field_attribute(&mut self, name: &str, value: &str) -> &mut Self {
+    pub fn field_attribute(mut self, name: &str, value: &str) -> Self {
         self.field_attributes.push(MetadataField::new(name, value));
         self
     }
 
-    pub(crate) fn build(&mut self) -> Result<Credentials> {
+    pub(crate) fn build(self) -> Result<Credentials> {
         Ok(Credentials {
             display_name: self.display_name.clone(),
             note: self.note.clone(),
@@ -222,8 +221,7 @@ mod tests {
 
     #[test]
     fn test_update_creds_request_display_name() {
-        let mut builder = UpdateCredsRequest::new();
-        builder.display_name("foo");
+        let builder = UpdateCredsRequest::new().display_name("foo");
         assert_eq!(
             builder,
             UpdateCredsRequest {
@@ -235,8 +233,7 @@ mod tests {
 
     #[test]
     fn test_update_creds_request_note() {
-        let mut builder = UpdateCredsRequest::new();
-        builder.note("foo");
+        let builder = UpdateCredsRequest::new().note("foo");
         assert_eq!(
             builder,
             UpdateCredsRequest {
@@ -248,8 +245,7 @@ mod tests {
 
     #[test]
     fn test_update_creds_request_avatar() {
-        let mut builder = UpdateCredsRequest::new();
-        builder.avatar("/path/to/avatar.png");
+        let builder = UpdateCredsRequest::new().avatar("/path/to/avatar.png");
         assert_eq!(
             builder,
             UpdateCredsRequest {
@@ -261,8 +257,7 @@ mod tests {
 
     #[test]
     fn test_update_creds_request_header() {
-        let mut builder = UpdateCredsRequest::new();
-        builder.header("/path/to/header.png");
+        let builder = UpdateCredsRequest::new().header("/path/to/header.png");
         assert_eq!(
             builder,
             UpdateCredsRequest {
@@ -274,8 +269,7 @@ mod tests {
 
     #[test]
     fn test_update_creds_request_privacy() {
-        let mut builder = UpdateCredsRequest::new();
-        builder.privacy(Visibility::Public);
+        let builder = UpdateCredsRequest::new().privacy(Visibility::Public);
         assert_eq!(
             builder,
             UpdateCredsRequest {
@@ -287,8 +281,7 @@ mod tests {
 
     #[test]
     fn test_update_creds_request_sensitive() {
-        let mut builder = UpdateCredsRequest::new();
-        builder.sensitive(true);
+        let builder = UpdateCredsRequest::new().sensitive(true);
         assert_eq!(
             builder,
             UpdateCredsRequest {
@@ -300,8 +293,7 @@ mod tests {
 
     #[test]
     fn test_update_creds_request_field_attribute() {
-        let mut builder = UpdateCredsRequest::new();
-        builder.field_attribute("foo", "bar");
+        let builder = UpdateCredsRequest::new().field_attribute("foo", "bar");
         assert_eq!(
             builder,
             UpdateCredsRequest {
@@ -313,8 +305,7 @@ mod tests {
 
     #[test]
     fn test_update_creds_request_build() {
-        let mut builder = UpdateCredsRequest::new();
-        builder.display_name("test").note("a note");
+        let builder = UpdateCredsRequest::new().display_name("test").note("a note");
         let creds = builder.build().expect("Couldn't build Credentials");
         assert_eq!(
             creds,

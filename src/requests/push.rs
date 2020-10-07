@@ -59,8 +59,8 @@ impl Keys {
 /// let client = Mastodon::from(data);
 ///
 /// let keys = Keys::new("stahesuahoei293ise===", "tasecoa,nmeozka==");
-/// let mut request = AddPushRequest::new("http://example.com/push/endpoint", &keys);
-/// request.follow().reblog();
+/// let mut request = AddPushRequest::new("http://example.com/push/endpoint", &keys)
+///     .follow().reblog();
 ///
 /// client.add_push_subscription(&request)?;
 /// #   Ok(())
@@ -111,7 +111,7 @@ impl AddPushRequest {
     /// let mut request = AddPushRequest::new(push_endpoint, &keys);
     /// request.follow();
     /// ```
-    pub fn follow(&mut self) -> &mut Self {
+    pub fn follow(mut self) -> Self {
         self.follow = Some(true);
         self
     }
@@ -127,7 +127,7 @@ impl AddPushRequest {
     /// let mut request = AddPushRequest::new(push_endpoint, &keys);
     /// request.favourite();
     /// ```
-    pub fn favourite(&mut self) -> &mut Self {
+    pub fn favourite(mut self) -> Self {
         self.favourite = Some(true);
         self
     }
@@ -143,7 +143,7 @@ impl AddPushRequest {
     /// let mut request = AddPushRequest::new(push_endpoint, &keys);
     /// request.reblog();
     /// ```
-    pub fn reblog(&mut self) -> &mut Self {
+    pub fn reblog(mut self) -> Self {
         self.reblog = Some(true);
         self
     }
@@ -159,7 +159,7 @@ impl AddPushRequest {
     /// let mut request = AddPushRequest::new(push_endpoint, &keys);
     /// request.mention();
     /// ```
-    pub fn mention(&mut self) -> &mut Self {
+    pub fn mention(mut self) -> Self {
         self.mention = Some(true);
         self
     }
@@ -232,8 +232,8 @@ impl AddPushRequest {
 ///
 /// let client = Mastodon::from(data);
 ///
-/// let mut request = UpdatePushRequest::new("foobar");
-/// request.follow(true).reblog(true);
+/// let request = UpdatePushRequest::new("foobar")
+///     .follow(true).reblog(true);
 ///
 /// client.update_push_data(&request)?;
 /// #   Ok(())
@@ -274,7 +274,7 @@ impl UpdatePushRequest {
     /// let mut request = UpdatePushRequest::new("foobar");
     /// request.follow(true);
     /// ```
-    pub fn follow(&mut self, follow: bool) -> &mut Self {
+    pub fn follow(mut self, follow: bool) -> Self {
         self.follow = Some(follow);
         self
     }
@@ -288,7 +288,7 @@ impl UpdatePushRequest {
     /// let mut request = UpdatePushRequest::new("foobar");
     /// request.favourite(true);
     /// ```
-    pub fn favourite(&mut self, favourite: bool) -> &mut Self {
+    pub fn favourite(mut self, favourite: bool) -> Self {
         self.favourite = Some(favourite);
         self
     }
@@ -302,7 +302,7 @@ impl UpdatePushRequest {
     /// let mut request = UpdatePushRequest::new("foobar");
     /// request.reblog(true);
     /// ```
-    pub fn reblog(&mut self, reblog: bool) -> &mut Self {
+    pub fn reblog(mut self, reblog: bool) -> Self {
         self.reblog = Some(reblog);
         self
     }
@@ -316,7 +316,7 @@ impl UpdatePushRequest {
     /// let mut request = UpdatePushRequest::new("foobar");
     /// request.mention(true);
     /// ```
-    pub fn mention(&mut self, mention: bool) -> &mut Self {
+    pub fn mention(mut self, mention: bool) -> Self {
         self.mention = Some(mention);
         self
     }
@@ -400,8 +400,7 @@ mod tests {
     fn test_add_push_request_follow() {
         let endpoint = "https://example.com/push/endpoint";
         let keys = Keys::new("anetohias===", "oeatssah=");
-        let mut req = AddPushRequest::new(endpoint, &keys);
-        req.follow();
+        let req = AddPushRequest::new(endpoint, &keys).follow();
         assert_eq!(
             req,
             AddPushRequest {
@@ -420,8 +419,7 @@ mod tests {
     fn test_add_push_request_favourite() {
         let endpoint = "https://example.com/push/endpoint";
         let keys = Keys::new("anetohias===", "oeatssah=");
-        let mut req = AddPushRequest::new(endpoint, &keys);
-        req.favourite();
+        let req = AddPushRequest::new(endpoint, &keys).favourite();
         assert_eq!(
             req,
             AddPushRequest {
@@ -439,8 +437,7 @@ mod tests {
     fn test_add_push_request_reblog() {
         let endpoint = "https://example.com/push/endpoint";
         let keys = Keys::new("anetohias===", "oeatssah=");
-        let mut req = AddPushRequest::new(endpoint, &keys);
-        req.reblog();
+        let req = AddPushRequest::new(endpoint, &keys).reblog();
         assert_eq!(
             req,
             AddPushRequest {
@@ -458,8 +455,7 @@ mod tests {
     fn test_add_push_request_mention() {
         let endpoint = "https://example.com/push/endpoint";
         let keys = Keys::new("anetohias===", "oeatssah=");
-        let mut req = AddPushRequest::new(endpoint, &keys);
-        req.mention();
+        let req = AddPushRequest::new(endpoint, &keys).mention();
         assert_eq!(
             req,
             AddPushRequest {
@@ -498,8 +494,7 @@ mod tests {
     fn test_add_push_request_build() {
         let endpoint = "https://example.com/push/endpoint";
         let keys = Keys::new("anetohias===", "oeatssah=");
-        let mut req = AddPushRequest::new(endpoint, &keys);
-        req.follow().reblog();
+        let req = AddPushRequest::new(endpoint, &keys).follow().reblog();
         let form = req.build().expect("Couldn't build form");
         assert_eq!(
             form,
@@ -540,8 +535,7 @@ mod tests {
 
     #[test]
     fn test_update_push_request_follow() {
-        let mut req = UpdatePushRequest::new("some-id");
-        req.follow(true);
+        let req = UpdatePushRequest::new("some-id").follow(true);
         assert_eq!(
             req,
             UpdatePushRequest {
@@ -555,8 +549,7 @@ mod tests {
     }
     #[test]
     fn test_update_push_request_favourite() {
-        let mut req = UpdatePushRequest::new("some-id");
-        req.favourite(true);
+        let req = UpdatePushRequest::new("some-id").favourite(true);
         assert_eq!(
             req,
             UpdatePushRequest {
@@ -570,8 +563,7 @@ mod tests {
     }
     #[test]
     fn test_update_push_request_reblog() {
-        let mut req = UpdatePushRequest::new("some-id");
-        req.reblog(true);
+        let req = UpdatePushRequest::new("some-id").reblog(true);
         assert_eq!(
             req,
             UpdatePushRequest {
@@ -585,8 +577,7 @@ mod tests {
     }
     #[test]
     fn test_update_push_request_mention() {
-        let mut req = UpdatePushRequest::new("some-id");
-        req.mention(true);
+        let req = UpdatePushRequest::new("some-id").mention(true);
         assert_eq!(
             req,
             UpdatePushRequest {
@@ -615,8 +606,7 @@ mod tests {
 
     #[test]
     fn test_update_push_request_build() {
-        let mut req = UpdatePushRequest::new("some-id");
-        req.favourite(false);
+        let req = UpdatePushRequest::new("some-id").favourite(false);
         let form = req.build();
         assert_eq!(
             form,

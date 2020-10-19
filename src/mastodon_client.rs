@@ -104,11 +104,11 @@ pub trait MastodonClient {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v1/search
-    fn search<'a>(&self, q: &'a str, resolve: bool) -> Result<SearchResult> {
+    fn search(&self, q: &str, resolve: bool) -> Result<SearchResult> {
         unimplemented!("This method was not implemented");
     }
     /// GET /api/v2/search
-    fn search_v2<'a>(&self, q: &'a str, resolve: bool) -> Result<SearchResultV2> {
+    fn search_v2(&self, q: &str, resolve: bool) -> Result<SearchResultV2> {
         unimplemented!("This method was not implemented");
     }
     /// POST /api/v1/follows

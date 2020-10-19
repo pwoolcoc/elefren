@@ -31,6 +31,8 @@ pub struct Meta {
     pub original: Option<ImageDetails>,
     /// Smaller version.
     pub small: Option<ImageDetails>,
+    /// Focal points for smart cropping
+    pub focus: Option<ImageFocus>
 }
 
 /// Dimensions of an attachement.
@@ -44,6 +46,13 @@ pub struct ImageDetails {
     size: Option<String>,
     /// The aspect ratio of the attachment.
     aspect: Option<f64>,
+}
+
+/// Focal points of an attachment
+#[derive(Debug, Deserialize, Clone, Copy, PartialEq)]
+pub struct ImageFocus {
+    x: f64,
+    y: f64,
 }
 
 /// The type of media attachment.

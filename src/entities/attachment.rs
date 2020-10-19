@@ -49,6 +49,9 @@ pub struct ImageDetails {
 /// The type of media attachment.
 #[derive(Debug, Deserialize, Clone, Copy, PartialEq)]
 pub enum MediaType {
+    /// An audio track
+    #[serde(rename = "audio")]
+    Audio,
     /// An image.
     #[serde(rename = "image")]
     Image,

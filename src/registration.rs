@@ -300,7 +300,7 @@ impl Registered {
             .append_pair("response_type", "code")
             .append_pair("force_login", &self.force_login.to_string());
 
-        Ok(url.into_string())
+        Ok(url.into())
     }
 
     /// Create an access token from the client id, client secret, and code

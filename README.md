@@ -70,7 +70,7 @@ fn register() -> Result<Mastodon, Box<dyn Error>> {
 
 It also supports the [Streaming API](https://docs.joinmastodon.org/api/streaming):
 
-```no_run
+```rust,no_run
 use elefren::prelude::*;
 use elefren::entities::event::Event;
 

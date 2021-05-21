@@ -1,5 +1,6 @@
 use serde::Deserialize;
-use std::{error, fmt, io::Error as IoError};
+use std::{fmt, io::Error as IoError};
+use thiserror::Error;
 
 #[cfg(feature = "toml")]
 use ::toml::de::Error as TomlDeError;
@@ -23,22 +24,22 @@ use url::ParseError as UrlError;
 pub type Result<T> = ::std::result::Result<T, Error>;
 
 /// enum of possible errors encountered using the mastodon API.
-#[derive(Debug)]
+#[derive(Error, Debug)]
 pub enum Error {
     /// Error from the Mastodon API. This typically means something went
     /// wrong with your authentication or data.
-    Api(ApiError),
+    Api(#[from] ApiError),
     /// Error deserialising to json. Typically represents a breaking change in
     /// the Mastodon API
-    Serde(SerdeError),
+    Serde(#[from] SerdeError),
     /// Error serializing to url-encoded string
-    UrlEncoded(UrlEncodedError),
+    UrlEncoded(#[from] UrlEncodedError),
     /// Error encountered in the HTTP backend while requesting a route.
-    Http(HttpError),
+    Http(#[from] HttpError),
     /// Wrapper around the `std::io::Error` struct.
-    Io(IoError),
+    Io(#[from] IoError),
     /// Wrapper around the `url::ParseError` struct.
-    Url(UrlError),
+    Url(#[from] UrlError),
     /// Missing Client Id.
     ClientIdRequired,
     /// Missing Client Secret.
@@ -53,27 +54,27 @@ pub enum Error {
     MissingField(&'static str),
     #[cfg(feature = "toml")]
     /// Error serializing to toml
-    TomlSer(TomlSerError),
+    TomlSer(#[from] TomlSerError),
     #[cfg(feature = "toml")]
     /// Error deserializing from toml
-    TomlDe(TomlDeError),
+    TomlDe(#[from] TomlDeError),
     /// Error converting an http header to a string
-    HeaderStrError(HeaderStrError),
+    HeaderStrError(#[from] HeaderStrError),
     /// Error parsing the http Link header
-    HeaderParseError(HeaderParseError),
+    HeaderParseError(#[from] HeaderParseError),
     #[cfg(feature = "env")]
     /// Error deserializing from the environment
-    Envy(EnvyError),
+    Envy(#[from] EnvyError),
     /// Error serializing to a query string
-    SerdeQs(SerdeQsError),
+    SerdeQs(#[from] SerdeQsError),
     /// WebSocket error
-    WebSocket(WebSocketError),
+    WebSocket(#[from] WebSocketError),
     #[cfg(feature = "async")]
     /// http-types error
-    HttpTypes(HttpTypesError),
+    HttpTypes(#[from] HttpTypesError),
     #[cfg(feature = "async")]
     /// TLS error
-    Tls(TlsError),
+    Tls(#[from] TlsError),
     /// Other errors
     Other(String),
 }
@@ -84,42 +85,8 @@ impl fmt::Display for Error {
     }
 }
 
-impl error::Error for Error {
-    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
-        Some(match *self {
-            Error::Api(ref e) => e,
-            Error::Serde(ref e) => e,
-            Error::UrlEncoded(ref e) => e,
-            Error::Http(ref e) => e,
-            Error::Io(ref e) => e,
-            Error::Url(ref e) => e,
-            #[cfg(feature = "toml")]
-            Error::TomlSer(ref e) => e,
-            #[cfg(feature = "toml")]
-            Error::TomlDe(ref e) => e,
-            Error::HeaderStrError(ref e) => e,
-            Error::HeaderParseError(ref e) => e,
-            #[cfg(feature = "env")]
-            Error::Envy(ref e) => e,
-            Error::SerdeQs(ref e) => e,
-            Error::WebSocket(ref e) => e,
-
-            Error::Client(..) | Error::Server(..) => return None,
-            Error::ClientIdRequired => return None,
-            Error::ClientSecretRequired => return None,
-            Error::AccessTokenRequired => return None,
-            Error::MissingField(_) => return None,
-            #[cfg(feature = "async")]
-            Error::HttpTypes(..) => return None,
-            #[cfg(feature = "async")]
-            Error::Tls(ref e) => e,
-            Error::Other(..) => return None,
-        })
-    }
-}
-
 /// Error returned from the Mastodon API.
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Error, Clone, Debug, Deserialize)]
 pub struct ApiError {
     /// The type of error.
     pub error: Option<String>,
@@ -131,41 +98,6 @@ impl fmt::Display for ApiError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{:?}", self)
     }
-}
-
-impl error::Error for ApiError {}
-
-macro_rules! from {
-    ($($(#[$met:meta])* $typ:ident, $variant:ident,)*) => {
-        $(
-            $(#[$met])*
-            impl From<$typ> for Error {
-                fn from(from: $typ) -> Self {
-                    use crate::Error::*;
-                    $variant(from)
-                }
-            }
-        )*
-    }
-}
-
-from! {
-    HttpError, Http,
-    IoError, Io,
-    SerdeError, Serde,
-    UrlEncodedError, UrlEncoded,
-    UrlError, Url,
-    ApiError, Api,
-    #[cfg(feature = "toml")] TomlSerError, TomlSer,
-    #[cfg(feature = "toml")] TomlDeError, TomlDe,
-    HeaderStrError, HeaderStrError,
-    HeaderParseError, HeaderParseError,
-    #[cfg(feature = "env")] EnvyError, Envy,
-    SerdeQsError, SerdeQs,
-    WebSocketError, WebSocket,
-    #[cfg(feature = "async")] HttpTypesError, HttpTypes,
-    #[cfg(feature = "async")] TlsError, Tls,
-    String, Other,
 }
 
 #[macro_export]

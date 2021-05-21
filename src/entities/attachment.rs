@@ -22,6 +22,8 @@ pub struct Attachment {
     pub meta: Option<Meta>,
     /// Noop will be removed.
     pub description: Option<String>,
+    /// A hash computed by the BlurHash algorithm
+    pub blurhash: Option<String>,
 }
 
 /// Information about the attachment itself.

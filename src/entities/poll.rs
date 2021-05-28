@@ -1,6 +1,3 @@
-use crate::entities::status::Emoji;
-use serde::{Deserialize, Serialize};
-
 /// Represents a poll attached to a status.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Poll {
@@ -23,6 +20,7 @@ pub struct Poll {
     pub own_votes: Option<Vec<u64>>,
     /// Possible answers for the poll.
     pub options: Vec<PollOption>,
+    #[cfg(feature = "mastodon_2_4_0")]
     /// Custom emoji to be used for rendering poll options.
     pub emojis: Vec<Emoji>,
 }
@@ -35,3 +33,7 @@ pub struct PollOption {
     /// The number of received votes for this option.
     pub votes_count: Option<u64>,
 }
+
+#[cfg(feature = "mastodon_2_4_0")]
+use crate::entities::status::Emoji;
+use serde::{Deserialize, Serialize};

@@ -1,15 +1,8 @@
 //! Module containing all info relating to a status.
 
-use super::prelude::*;
-use crate::{
-    entities::{card::Card, poll::Poll},
-    status_builder::Visibility,
-};
-use chrono::prelude::*;
-use serde::{Deserialize, Serialize};
 
 /// A status from the instance.
-#[derive(Debug, Clone, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub struct Status {
     /// The ID of the status.
     pub id: String,
@@ -37,6 +30,7 @@ pub struct Status {
     pub mentions: Vec<Mention>,
     /// An array of tags.
     pub tags: Vec<Tag>,
+    #[cfg(feature = "mastodon_2_4_0")]
     /// An array of Emoji
     pub emojis: Vec<Emoji>,
     /// The number of reblogs for the status.
@@ -79,7 +73,7 @@ pub struct Status {
 }
 
 /// A mention of another user.
-#[derive(Debug, Clone, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub struct Mention {
     /// URL of user's profile (can be remote).
     pub url: String,
@@ -91,6 +85,7 @@ pub struct Mention {
     pub id: String,
 }
 
+#[cfg(feature = "mastodon_2_4_0")]
 /// Struct representing an emoji within text.
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 pub struct Emoji {
@@ -103,7 +98,7 @@ pub struct Emoji {
 }
 
 /// Hashtags in the status.
-#[derive(Debug, Clone, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub struct Tag {
     /// The hashtag, not including the preceding `#`.
     pub name: String,
@@ -114,7 +109,7 @@ pub struct Tag {
 }
 
 /// Represents daily usage history of a hashtag.
-#[derive(Debug, Clone, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub struct History {
     /// UNIX timestamp on midnight of the given day.
     day: String,
@@ -125,10 +120,19 @@ pub struct History {
 }
 
 /// Application details.
-#[derive(Debug, Clone, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub struct Application {
     /// Name of the application.
     pub name: String,
     /// Homepage URL of the application.
     pub website: Option<String>,
 }
+
+use super::prelude::*;
+use crate::{
+    entities::{card::Card, poll::Poll},
+    status_builder::Visibility,
+};
+use chrono::prelude::*;
+use serde::Deserialize;
+use serde::Serialize;

@@ -1,8 +1,8 @@
 //! Module representing cards of statuses.
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// A card of a status.
-#[derive(Debug, Clone, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub struct Card {
     /// The url associated with the card.
     pub url: String,

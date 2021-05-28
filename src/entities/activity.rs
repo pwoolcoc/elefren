@@ -1,5 +1,7 @@
+#[cfg(feature = "mastodon_2_1_2")]
 use serde::{Deserialize, Serialize};
 
+#[cfg(feature = "mastodon_2_1_2")]
 /// Represents a weekly bucket of instance activity.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Activity {

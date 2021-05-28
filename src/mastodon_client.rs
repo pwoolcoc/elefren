@@ -43,6 +43,7 @@ pub trait MastodonClient {
     fn get_home_timeline(&self) -> Result<Page<Status>> {
         unimplemented!("This method was not implemented");
     }
+    #[cfg(feature = "mastodon_2_4_0")]
     /// GET /api/v1/custom_emojis
     fn get_emojis(&self) -> Result<Page<Emoji>> {
         unimplemented!("This method was not implemented");

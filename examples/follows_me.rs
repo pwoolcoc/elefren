@@ -9,7 +9,7 @@ use std::error;
 fn main() -> Result<(), Box<dyn error::Error>> {
     let mastodon = register::get_mastodon_data()?;
     for account in mastodon.follows_me()?.items_iter() {
-        println!("{}", account.acct);
+        println!("{}", account.acct());
     }
 
     Ok(())

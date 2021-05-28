@@ -4,6 +4,12 @@ use serde::Deserialize;
 pub mod account;
 /// Data structures for ser/de of activity-related resources
 pub mod activity;
+#[cfg(feature = "mastodon_2_9_1")]
+/// Data structures for ser/de of admin-related resources
+pub mod admin;
+#[cfg(feature = "mastodon_3_1_0")]
+/// Data structures for ser/de of announcement-related resources
+pub mod announcement;
 /// Data structures for ser/de of attachment-related resources
 pub mod attachment;
 /// Data structures for ser/de of card-related resources
@@ -59,7 +65,9 @@ pub mod prelude {
         relationship::Relationship,
         report::Report,
         search_result::{SearchResult, SearchResultV2},
-        status::{Application, Emoji, Status},
+        status::{Application, Status},
         Empty,
     };
+    #[cfg(feature = "mastodon_2_4_0")]
+    pub use super::status::Emoji;
 }

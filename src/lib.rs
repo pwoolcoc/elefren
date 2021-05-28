@@ -183,7 +183,7 @@ impl MastodonClient for Mastodon {
         (get) get_home_timeline: "timelines/home" => Status,
         (get) get_local_timeline: "timelines/public?local=true" => Status,
         (get) get_federated_timeline: "timelines/public?local=false" => Status,
-        (get) get_emojis: "custom_emojis" => Emoji,
+        #[cfg(feature = "mastodon_2_4_0")] (get) get_emojis: "custom_emojis" => Emoji,
         (get) mutes: "mutes" => Account,
         (get) notifications: "notifications" => Notification,
         (get) reports: "reports" => Report,
@@ -422,13 +422,13 @@ impl MastodonClient for Mastodon {
     /// Get all accounts that follow the authenticated user
     fn follows_me(&self) -> Result<Page<Account>> {
         let me = self.verify_credentials()?;
-        Ok(self.followers(&me.id)?)
+        Ok(self.followers(me.id())?)
     }
 
     /// Get all accounts that the authenticated user follows
     fn followed_by_me(&self) -> Result<Page<Account>> {
         let me = self.verify_credentials()?;
-        Ok(self.following(&me.id)?)
+        Ok(self.following(me.id())?)
     }
 
     /// returns events that are relevant to the authorized user, i.e. home

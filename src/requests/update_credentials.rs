@@ -3,8 +3,10 @@ use std::{
     path::{Path, PathBuf},
 };
 
+#[cfg(feature = "mastodon_2_4_0")]
+use crate::entities::account::MetadataField;
 use crate::{
-    entities::account::{Credentials, MetadataField, UpdateSource},
+    entities::account::{Credentials, UpdateSource},
     errors::Result,
     status_builder,
 };
@@ -40,6 +42,7 @@ pub struct UpdateCredsRequest {
     note: Option<String>,
     avatar: Option<PathBuf>,
     header: Option<PathBuf>,
+    #[cfg(feature = "mastodon_2_4_0")]
     field_attributes: Vec<MetadataField>,
 
     // UpdateSource fields
@@ -168,6 +171,7 @@ impl UpdateCredsRequest {
         self
     }
 
+    #[cfg(feature = "mastodon_2_4_0")]
     /// Add a metadata field
     ///
     /// # Example
@@ -195,6 +199,7 @@ impl UpdateCredsRequest {
                 privacy: self.privacy,
                 sensitive: self.sensitive,
             }),
+            #[cfg(feature = "mastodon_2_4_0")]
             fields_attributes: self.field_attributes,
         })
     }
@@ -203,8 +208,10 @@ impl UpdateCredsRequest {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[cfg(feature = "mastodon_2_4_0")]
+    use crate::entities::account::MetadataField;
     use crate::{
-        entities::account::{Credentials, MetadataField, UpdateSource},
+        entities::account::{Credentials, UpdateSource},
         status_builder::Visibility,
     };
 
@@ -291,6 +298,7 @@ mod tests {
         );
     }
 
+    #[cfg(feature = "mastodon_2_4_0")]
     #[test]
     fn test_update_creds_request_field_attribute() {
         let builder = UpdateCredsRequest::new().field_attribute("foo", "bar");

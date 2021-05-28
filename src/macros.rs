@@ -16,7 +16,7 @@ macro_rules! methods {
 
 macro_rules! paged_routes {
 
-    (($method:ident) $name:ident: $url:expr => $ret:ty, $($rest:tt)*) => {
+    ($(#[$m:meta])* ($method:ident) $name:ident: $url:expr => $ret:ty, $($rest:tt)*) => {
         doc_comment::doc_comment! {
             concat!(
             "Equivalent to `", stringify!($method), " /api/v1/",
@@ -40,6 +40,7 @@ macro_rules! paged_routes {
             "# }\n",
             "```"
             ),
+            $(#[$m])*
             fn $name(&self) -> Result<Page<$ret>> {
                 let url = self.route(concat!("/api/v1/", $url));
                 let response = self.send_blocking(

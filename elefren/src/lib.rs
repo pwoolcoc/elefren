@@ -109,6 +109,7 @@ pub mod entities;
 pub mod errors;
 /// Collection of helpers for serializing/deserializing `Data` objects
 pub mod helpers;
+mod itemsiter;
 mod mastodon_client;
 /// Constructing media attachments for a status.
 pub mod media_builder;

@@ -130,8 +130,9 @@ pub struct Application {
 
 use super::prelude::*;
 use crate::{
-    entities::{card::Card, poll::Poll},
-    status_builder::Visibility,
+    card::Card,
+    poll::Poll,
+    visibility::Visibility,
 };
 use chrono::prelude::*;
 use serde::Deserialize;

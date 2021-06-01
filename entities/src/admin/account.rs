@@ -15,7 +15,7 @@ pub struct Account {
     disabled: bool,
     silenced: bool,
     suspended: bool,
-    account: crate::entities::account::Account,
+    account: crate::account::Account,
     created_by_application_id: Option<String>,
     invited_by_account_id: Option<String>,
 
@@ -24,7 +24,7 @@ pub struct Account {
     /// errors with newer versions, you can set `--no-default-features --features mastodon_2_4_0`
     /// and newer fields will go here so they can still be used
     #[serde(flatten)]
-    elefren_extra_fields: HashMap<String, Value>,
+    elefren_extra: HashMap<String, Value>,
 }
 impl Account {
     /// The ID of the account in the database.
@@ -84,7 +84,7 @@ impl Account {
         self.suspended
     }
     /// User-level information about the account.
-    pub fn account(&self) -> &crate::entities::account::Account {
+    pub fn account(&self) -> &crate::account::Account {
         &self.account
     }
     /// The ID of the application that created this account.

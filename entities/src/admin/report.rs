@@ -6,11 +6,11 @@ pub struct Report {
     comment: String,
     created_at: DateTime<Utc>,
     updated_at: DateTime<Utc>,
-    account: crate::entities::account::Account,
-    target_account: crate::entities::account::Account,
-    assigned_account: crate::entities::account::Account,
+    account: crate::account::Account,
+    target_account: crate::account::Account,
+    assigned_account: crate::account::Account,
     action_taken_by_account: String, // TODO enumerable
-    statuses: Vec<crate::entities::status::Status>,
+    statuses: Vec<crate::status::Status>,
 
     /// A place that unknown fields go. This is mainly provided for forwards compatibility,
     /// i.e. if you want to support mastodon versions going back to 2.4.0 but don't want deser
@@ -41,15 +41,15 @@ impl Report {
         &self.updated_at
     }
     /// The account which filed the report.
-    pub fn account(&self) -> &crate::entities::account::Account {
+    pub fn account(&self) -> &crate::account::Account {
         &self.account
     }
     /// The account being reported.
-    pub fn target_account(&self) -> &crate::entities::account::Account {
+    pub fn target_account(&self) -> &crate::account::Account {
         &self.target_account
     }
     /// The account of the moderator assigned to this report.
-    pub fn assigned_account(&self) -> &crate::entities::account::Account {
+    pub fn assigned_account(&self) -> &crate::account::Account {
         &self.assigned_account
     }
     /// The action taken by the moderator who handled the report.
@@ -57,7 +57,7 @@ impl Report {
         &self.action_taken_by_account
     }
     /// Statuses attached to the report, for context.
-    pub fn statuses(&self) -> &[crate::entities::status::Status] {
+    pub fn statuses(&self) -> &[crate::status::Status] {
         &self.statuses
     }
 }

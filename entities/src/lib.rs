@@ -10,6 +10,8 @@ pub mod admin;
 #[cfg(feature = "mastodon_3_1_0")]
 /// Data structures for ser/de of announcement-related resources
 pub mod announcement;
+/// Data structures for ser/de of application-related resources
+pub mod application;
 /// Data structures for ser/de of attachment-related resources
 pub mod attachment;
 /// Data structures for ser/de of card-related resources
@@ -22,7 +24,6 @@ pub mod event;
 pub mod filter;
 /// Data structures for ser/de of instance-related resources
 pub mod instance;
-pub(crate) mod itemsiter;
 /// Data structures for ser/de of list-related resources
 pub mod list;
 /// Data structures for ser/de of mention-related resources
@@ -41,6 +42,8 @@ pub mod report;
 pub mod search_result;
 /// Data structures for ser/de of status-related resources
 pub mod status;
+/// Data structures for ser/de of visibility-related resources
+pub mod visibility;
 
 /// An empty JSON object.
 #[derive(Deserialize, Debug, Copy, Clone, PartialEq)]

@@ -6,9 +6,11 @@ use std::{
 #[cfg(feature = "mastodon_2_4_0")]
 use crate::entities::account::MetadataField;
 use crate::{
-    entities::account::{Credentials, UpdateSource},
+    entities::{
+        account::{Credentials, UpdateSource},
+        visibility::Visibility,
+    },
     errors::Result,
-    status_builder,
 };
 
 /// Builder to pass to the Mastodon::update_credentials method
@@ -26,7 +28,7 @@ use crate::{
 /// #   redirect: "".into(),
 /// #   token: "".into(),
 /// # };
-/// use elefren::{prelude::*, status_builder::Visibility, UpdateCredsRequest};
+/// use elefren::{prelude::*, entities::visibility::Visibility, UpdateCredsRequest};
 ///
 /// let client = Mastodon::from(data);
 /// let builder = UpdateCredsRequest::new()
@@ -46,7 +48,7 @@ pub struct UpdateCredsRequest {
     field_attributes: Vec<MetadataField>,
 
     // UpdateSource fields
-    privacy: Option<status_builder::Visibility>,
+    privacy: Option<Visibility>,
     sensitive: Option<bool>,
 }
 
@@ -143,13 +145,13 @@ impl UpdateCredsRequest {
     ///
     /// ```
     /// # extern crate elefren;
-    /// use elefren::{status_builder::Visibility, UpdateCredsRequest};
+    /// use elefren::{entities::visibility::Visibility, UpdateCredsRequest};
     ///
     /// let mut builder = UpdateCredsRequest::new();
     ///
     /// builder.privacy(Visibility::Public);
     /// ```
-    pub fn privacy(mut self, privacy: status_builder::Visibility) -> Self {
+    pub fn privacy(mut self, privacy: Visibility) -> Self {
         self.privacy = Some(privacy);
         self
     }
@@ -211,8 +213,10 @@ mod tests {
     #[cfg(feature = "mastodon_2_4_0")]
     use crate::entities::account::MetadataField;
     use crate::{
-        entities::account::{Credentials, UpdateSource},
-        status_builder::Visibility,
+        entities::{
+            account::{Credentials, UpdateSource},
+            visibility::Visibility,
+        },
     };
 
     #[test]

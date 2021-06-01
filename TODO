@@ -1,0 +1,4 @@
+* Forward- and backwards-compatibility with entities. Feature gate everything, provide the "catch-all" bucket using serde(flatten),
+  and then use getters instead of public field access. Getters themselves won't be feature-gated, though their implementation will be
+  so if the feature is not included, we look in the "catch-all" bucket for the value, and if the feature is included we just use the field
+

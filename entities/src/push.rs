@@ -26,46 +26,64 @@ pub struct Subscription {
     pub alerts: Option<Alerts>,
 }
 
-pub(crate) mod add_subscription {
+/// Entities for adding a push subscription
+pub mod add_subscription {
     use super::Alerts;
     use serde::Serialize;
 
+    /// TODO
     #[derive(Debug, Clone, PartialEq, Serialize, Default)]
-    pub(crate) struct Form {
-        pub(crate) subscription: Subscription,
-        pub(crate) data: Option<Data>,
+    pub struct Form {
+        /// TODO
+        pub subscription: Subscription,
+        /// TODO
+        pub data: Option<Data>,
     }
 
+    /// TODO
     #[derive(Debug, Clone, PartialEq, Serialize, Default)]
-    pub(crate) struct Subscription {
-        pub(crate) endpoint: String,
-        pub(crate) keys: Keys,
+    pub struct Subscription {
+        /// TODO
+        pub endpoint: String,
+        /// TODO
+        pub keys: Keys,
     }
 
+    /// TODO
     #[derive(Debug, Clone, PartialEq, Serialize, Default)]
-    pub(crate) struct Keys {
-        pub(crate) p256dh: String,
-        pub(crate) auth: String,
+    pub struct Keys {
+        /// TODO
+        pub p256dh: String,
+        /// TODO
+        pub auth: String,
     }
 
+    /// TODO
     #[derive(Debug, Clone, PartialEq, Serialize, Default)]
-    pub(crate) struct Data {
-        pub(crate) alerts: Option<Alerts>,
+    pub struct Data {
+        /// TODO
+        pub alerts: Option<Alerts>,
     }
 }
 
-pub(crate) mod update_data {
+/// Entities for push updates
+pub mod update_data {
     use super::Alerts;
     use serde::Serialize;
 
+    /// TODO
     #[derive(Debug, Clone, PartialEq, Serialize, Default)]
-    pub(crate) struct Data {
-        pub(crate) alerts: Option<Alerts>,
+    pub struct Data {
+        /// TODO
+        pub alerts: Option<Alerts>,
     }
 
+    /// TODO
     #[derive(Debug, Clone, PartialEq, Serialize, Default)]
-    pub(crate) struct Form {
-        pub(crate) id: String,
-        pub(crate) data: Data,
+    pub struct Form {
+        /// TODO
+        pub id: String,
+        /// TODO
+        pub data: Data,
     }
 }

@@ -35,5 +35,5 @@ pub struct PollOption {
 }
 
 #[cfg(feature = "mastodon_2_4_0")]
-use crate::entities::status::Emoji;
+use crate::status::Emoji;
 use serde::{Deserialize, Serialize};

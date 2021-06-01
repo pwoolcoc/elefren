@@ -1,4 +1,4 @@
-use crate::entities::{notification::Notification, status::Status};
+use crate::{notification::Notification, status::Status};
 
 #[derive(Debug, Clone)]
 #[allow(clippy::large_enum_variant)]

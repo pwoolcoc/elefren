@@ -1,5 +1,6 @@
 use isolang::Language;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
+use crate::entities::visibility::Visibility;
 
 /// A builder pattern struct for constructing a status.
 ///
@@ -38,7 +39,7 @@ impl StatusBuilder {
     ///
     /// ```rust,no_run
     /// # use elefren::prelude::*;
-    /// # use elefren::status_builder::Visibility;
+    /// # use elefren::entities::visibility::Visibility;
     /// # fn main() -> Result<(), elefren::Error> {
     /// # let data = Data {
     /// #     base: "".into(),
@@ -187,7 +188,7 @@ impl StatusBuilder {
     ///
     /// ```rust
     /// # use elefren::prelude::*;
-    /// # use elefren::status_builder::Visibility;
+    /// # use elefren::entities::visibility::Visibility;
     /// # fn main() -> Result<(), elefren::Error> {
     /// let status = StatusBuilder::new()
     ///     .status("awooooooo")
@@ -270,26 +271,6 @@ pub struct NewStatus {
     language: Option<Language>,
     #[serde(skip_serializing_if = "Option::is_none")]
     content_type: Option<String>,
-}
-
-/// The visibility of a status.
-#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq)]
-#[serde(rename_all = "lowercase")]
-pub enum Visibility {
-    /// A Direct message to a user
-    Direct,
-    /// Only available to followers
-    Private,
-    /// Not shown in public timelines
-    Unlisted,
-    /// Posted to public timelines
-    Public,
-}
-
-impl Default for Visibility {
-    fn default() -> Self {
-        Visibility::Public
-    }
 }
 
 #[cfg(test)]

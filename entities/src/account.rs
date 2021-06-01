@@ -147,7 +147,8 @@ pub struct MetadataField {
 
 #[cfg(feature = "mastodon_2_4_0")]
 impl MetadataField {
-    pub(crate) fn new(name: &str, value: &str) -> MetadataField {
+    /// Create a new MetadataField
+    pub fn new(name: &str, value: &str) -> MetadataField {
         MetadataField {
             name: name.into(),
             value: value.into(),
@@ -164,7 +165,7 @@ pub struct Source {
     /// Metadata about the account.
     fields: Vec<MetadataField>,
     /// The default post privacy to be used for new statuses.
-    privacy: Option<status_builder::Visibility>,
+    privacy: Option<Visibility>,
     #[serde(deserialize_with = "string_or_bool")]
     /// Whether new statuses should be marked sensitive by default.
     sensitive: Option<bool>,
@@ -198,29 +199,39 @@ fn string_or_bool<'de, D: de::Deserializer<'de>>(val: D) -> ::std::result::Resul
     }))
 }
 
+/// Options for the source of the update_credentials call
 #[derive(Debug, Default, Clone, Serialize, PartialEq)]
-pub(crate) struct UpdateSource {
+pub struct UpdateSource {
+    /// TODO
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) privacy: Option<status_builder::Visibility>,
+    pub privacy: Option<Visibility>,
+    /// TODO
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) sensitive: Option<bool>,
+    pub sensitive: Option<bool>,
 }
 
+/// Data for the credentials of the update_credentials call
 #[derive(Debug, Default, Serialize, PartialEq)]
-pub(crate) struct Credentials {
+pub struct Credentials {
+    /// TODO
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) display_name: Option<String>,
+    pub display_name: Option<String>,
+    /// TODO
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) note: Option<String>,
+    pub note: Option<String>,
+    /// TODO
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) avatar: Option<PathBuf>,
+    pub avatar: Option<PathBuf>,
+    /// TODO
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) header: Option<PathBuf>,
+    pub header: Option<PathBuf>,
+    /// TODO
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) source: Option<UpdateSource>,
+    pub source: Option<UpdateSource>,
+    /// TODO
     #[cfg(feature = "mastodon_2_4_0")]
     #[serde(serialize_with = "fields_attributes_ser::ser")]
-    pub(crate) fields_attributes: Vec<MetadataField>,
+    pub fields_attributes: Vec<MetadataField>,
 }
 
 #[cfg(feature = "mastodon_2_4_0")]
@@ -240,8 +251,8 @@ mod fields_attributes_ser {
 }
 
 #[cfg(feature = "mastodon_2_4_0")]
-use crate::entities::status::Emoji;
-use crate::status_builder;
+use crate::status::Emoji;
+use crate::visibility::Visibility;
 use chrono::prelude::*;
 #[cfg(feature = "mastodon_2_4_2")]
 use isolang::Language;

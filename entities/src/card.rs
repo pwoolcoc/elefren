@@ -1,7 +1,7 @@
 //! Module representing cards of statuses.
 
 /// A card of a status.
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Entity)]
 pub struct Card {
     /// Location of linked resource.
     url: String,
@@ -112,21 +112,6 @@ impl Card {
     pub fn blurhash(&self) -> Option<&String> {
         self.blurhash.as_ref()
     }
-
-    /// Look for a key among the unknown values
-    pub fn contains_key(&self, key: &str) -> bool {
-        self.elefren_extra.contains_key(key)
-    }
-
-    /// Get unknown values
-    pub fn get(&self, key: &str) -> Option<&Value> {
-        self.elefren_extra.get(key)
-    }
-
-    /// Iterator over unknown values
-    pub fn keys(&self) -> impl Iterator<Item=&String> {
-        self.elefren_extra.keys()
-    }
 }
 
 /// The possible card types
@@ -147,3 +132,4 @@ pub enum CardType {
 use std::collections::HashMap;
 use serde_json::Value;
 use serde::{Deserialize, Serialize};
+use derive_entity::Entity;

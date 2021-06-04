@@ -1,7 +1,7 @@
 //! Module containing everything related to media attachements.
 
 /// A struct representing a media attachment.
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Entity)]
 pub struct Attachment {
     id: String,
     r#type: MediaType,
@@ -14,6 +14,9 @@ pub struct Attachment {
     description: Option<String>,
     #[cfg(feature = "mastodon_2_8_1")]
     blurhash: String,
+
+    #[serde(flatten)]
+    elefren_extra: HashMap<String, Value>,
 }
 impl Attachment {
     /// ID of the attachment.
@@ -58,7 +61,7 @@ impl Attachment {
 }
 
 /// Information about the attachment itself.
-#[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Entity)]
 pub struct Meta {
     original: Option<ImageDetails>,
     small: Option<ImageDetails>,
@@ -78,29 +81,18 @@ impl Meta {
     }
     #[cfg(feature = "mastodon_2_3_0")]
     /// Coordinates for thumbnail cropping
-    pub fn focus(&self) -> Option<Focus> {
-        self.focus
-    }
-    /// Checks whether a key exists in the extra bucket
-    pub fn contains_key(&self, key: &str) -> bool {
-        self.elefren_extra.contains_key(key)
-    }
-    /// An iterator over the keys that may be in the extra bucket
-    pub fn keys(&self) -> impl Iterator<Item=&String> {
-        self.elefren_extra.keys()
-    }
-    /// Any other meta information
-    pub fn get(&self, key: &str) -> Option<&Value> {
-        self.elefren_extra.get(key)
+    pub fn focus(&self) -> Option<&Focus> {
+        self.focus.as_ref()
     }
 }
 
 #[cfg(feature = "mastodon_2_3_0")]
 /// Focal point for an image
-#[derive(Debug, Deserialize, Serialiez, Clone, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Entity)]
 pub struct Focus {
     x: f64,
     y: f64,
+    #[serde(flatten)]
     elefren_extra: HashMap<String, Value>,
 }
 #[cfg(feature = "mastodon_2_3_0")]
@@ -116,12 +108,15 @@ impl Focus {
 }
 
 /// Dimensions of an attachement.
-#[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Entity)]
 pub struct ImageDetails {
     width: u64,
     height: u64,
     size: Option<String>,
     aspect: Option<f64>,
+
+    #[serde(flatten)]
+    elefren_extra: HashMap<String, Value>,
 }
 impl ImageDetails {
     /// width of attachment.
@@ -166,3 +161,4 @@ pub enum MediaType {
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
+use derive_entity::Entity;

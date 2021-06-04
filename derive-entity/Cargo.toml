@@ -1,0 +1,13 @@
+[package]
+name = "derive-entity"
+version = "0.1.0"
+authors = ["Paul Woolcock <paul@woolcock.us>"]
+edition = "2018"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1.0.27"
+quote = "1.0.9"
+syn = "1.0.72"

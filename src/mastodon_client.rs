@@ -371,7 +371,11 @@ pub trait MastodonClient {
 /// Trait that represents clients that can make unauthenticated calls to a
 /// mastodon instance
 #[allow(unused)]
+#[async_trait::async_trait]
 pub trait MastodonUnauthenticated {
+    /// Type that wraps streaming API streams
+    type Stream: Iterator<Item = Event>;
+
     /// GET /api/v1/statuses/:id
     fn get_status(&self, id: &str) -> Result<Status> {
         unimplemented!("This method was not implemented");
@@ -392,4 +396,7 @@ pub trait MastodonUnauthenticated {
     fn favourited_by(&self, id: &str) -> Result<Page<Account>> {
         unimplemented!("This method was not implemented");
     }
+
+    /// Get a stream of the public timeline
+    fn streaming_public(&self) -> Result<Self::Stream>;
 }

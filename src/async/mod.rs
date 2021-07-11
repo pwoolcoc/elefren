@@ -249,7 +249,7 @@ async fn deserialize<T: serde::de::DeserializeOwned>(mut response: Response) -> 
         Ok(t) => {
             log::debug!("{}", String::from_utf8_lossy(&bytes));
             t
-        },
+        }
         Err(e) => {
             log::error!("{}", String::from_utf8_lossy(&bytes));
             let err = if let Ok(error) = serde_json::from_slice(&bytes) {
@@ -258,6 +258,6 @@ async fn deserialize<T: serde::de::DeserializeOwned>(mut response: Response) -> 
                 e.into()
             };
             return Err(err);
-        },
+        }
     })
 }

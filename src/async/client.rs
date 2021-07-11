@@ -40,7 +40,7 @@ pub(super) async fn fetch(req: Request) -> Result<Response> {
             // In case of HTTPS, establish a secure TLS connection first.
             let stream = async_native_tls::connect(&host, stream).await?;
             async_h1::connect(stream, req).await?
-        },
+        }
         scheme => return Err(Error::Other(format!("unsupported scheme '{}'", scheme))),
     };
     Ok(resp)

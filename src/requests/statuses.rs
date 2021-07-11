@@ -1,22 +1,8 @@
 use crate::errors::Error;
+use crate::requests::util::bool_qs_serialize;
+
 use serde::Serialize;
 use std::{borrow::Cow, convert::Into};
-
-mod bool_qs_serialize {
-    use serde::Serializer;
-
-    pub fn is_false(b: &bool) -> bool {
-        !*b
-    }
-
-    pub fn serialize<S: Serializer>(b: &bool, s: S) -> Result<S::Ok, S::Error> {
-        if *b {
-            s.serialize_i64(1)
-        } else {
-            s.serialize_i64(0)
-        }
-    }
-}
 
 /// Builder for making a client.statuses() call
 ///
@@ -53,21 +39,6 @@ pub struct StatusesRequest<'a> {
     #[serde(skip_serializing_if = "bool_qs_serialize::is_false")]
     #[serde(serialize_with = "bool_qs_serialize::serialize")]
     exclude_reblogs: bool,
-}
-
-impl<'a> Into<Option<StatusesRequest<'a>>> for &'a mut StatusesRequest<'a> {
-    fn into(self) -> Option<StatusesRequest<'a>> {
-        Some(StatusesRequest {
-            only_media: self.only_media,
-            exclude_replies: self.exclude_replies,
-            pinned: self.pinned,
-            max_id: self.max_id.clone(),
-            since_id: self.since_id.clone(),
-            limit: self.limit,
-            min_id: self.min_id.clone(),
-            exclude_reblogs: self.exclude_reblogs,
-        })
-    }
 }
 
 impl<'a> StatusesRequest<'a> {

@@ -7,11 +7,9 @@ use std::convert::TryInto;
 use crate::{
     apps::{App, AppBuilder},
     scopes::Scopes,
-    Data,
-    Error,
-    Mastodon,
-    MastodonBuilder,
-    Result,
+    mastodon::Mastodon,
+    mastodon::MastodonBuilder,
+    Data, Error, Result,
 };
 
 const DEFAULT_REDIRECT_URI: &str = "urn:ietf:wg:oauth:2.0:oob";
@@ -100,7 +98,9 @@ impl<'a> Registration<'a> {
     fn send(&self, req: RequestBuilder) -> Result<Response> {
         let req = req.build()?;
         let handle = tokio::runtime::Handle::current();
-        Ok(handle.block_on(self.client.execute(req))?)
+        handle
+            .block_on(self.client.execute(req))
+            .map_err(Error::from)
     }
 
     /// Register the given application
@@ -180,7 +180,9 @@ impl<'a> Registration<'a> {
     fn send_app(&self, app: &App) -> Result<OAuth> {
         let url = format!("{}/api/v1/apps", self.base);
         let handle = tokio::runtime::Handle::current();
-        Ok(handle.block_on(self.send(self.client.post(&url).json(&app))?.json())?)
+        handle
+            .block_on(self.send(self.client.post(&url).json(&app))?.json())
+            .map_err(Error::from)
     }
 }
 
@@ -237,7 +239,9 @@ impl Registered {
     fn send(&self, req: RequestBuilder) -> Result<Response> {
         let req = req.build()?;
         let handle = tokio::runtime::Handle::current();
-        Ok(handle.block_on(self.client.execute(req))?)
+        handle
+            .block_on(self.client.execute(req))
+            .map_err(Error::from)
     }
 
     /// Returns the parts of the `Registered` struct that can be used to
@@ -290,7 +294,7 @@ impl Registered {
 
     /// Returns the full url needed for authorisation. This needs to be opened
     /// in a browser.
-    pub fn authorize_url(&self) -> Result<String> {
+    pub fn authorize_url(&self) -> Result<url::Url> {
         let mut url = url::Url::parse(&self.base)?.join("/oauth/authorize")?;
 
         url.query_pairs_mut()
@@ -300,7 +304,7 @@ impl Registered {
             .append_pair("response_type", "code")
             .append_pair("force_login", &self.force_login.to_string());
 
-        Ok(url.into())
+        Ok(url)
     }
 
     /// Create an access token from the client id, client secret, and code
@@ -323,9 +327,9 @@ impl Registered {
             token: token.access_token.into(),
         };
 
-        let mut builder = MastodonBuilder::new();
+        let mut builder = MastodonBuilder::default();
         builder.client(self.client.clone()).data(data);
-        Ok(builder.build()?)
+        builder.build()
     }
 }
 

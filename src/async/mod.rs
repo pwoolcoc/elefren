@@ -69,7 +69,7 @@ impl Client<Unauthenticated> {
 impl<A: Debug + Authenticate> Client<A> {
     async fn send(&self, mut req: Request) -> Result<Response> {
         self.auth.authenticate(&mut req).await?;
-        Ok(client::fetch(req).await?)
+        client::fetch(req).await
     }
 
     /// GET /api/v1/timelines/public
@@ -105,7 +105,7 @@ impl<A: Debug + Authenticate> Client<A> {
     pub async fn status(&self, id: &str) -> Result<Status> {
         let url = self.base_url.join(&format!("api/v1/statuses/{}", id))?;
         let response = self.send(Request::new(Method::Get, url)).await?;
-        Ok(deserialize(response).await?)
+        deserialize(response).await
     }
 
     /// GET /api/v1/statuses/:id/context
@@ -114,7 +114,7 @@ impl<A: Debug + Authenticate> Client<A> {
             .base_url
             .join(&format!("api/v1/statuses/{}/context", id))?;
         let response = self.send(Request::new(Method::Get, url)).await?;
-        Ok(deserialize(response).await?)
+        deserialize(response).await
     }
 
     /// GET /api/v1/statuses/:id/card
@@ -123,7 +123,7 @@ impl<A: Debug + Authenticate> Client<A> {
             .base_url
             .join(&format!("api/v1/statuses/{}/card", id))?;
         let response = self.send(Request::new(Method::Get, url)).await?;
-        Ok(deserialize(response).await?)
+        deserialize(response).await
     }
 
     /// GET /api/v1/statuses/:id/reblogged_by
@@ -152,7 +152,7 @@ impl<A: Debug + Authenticate> Client<A> {
     pub async fn account(&self, id: &str) -> Result<Account> {
         let url = self.base_url.join(&format!("api/v1/accounts/{}", id))?;
         let response = self.send(Request::new(Method::Get, url)).await?;
-        Ok(deserialize(response).await?)
+        deserialize(response).await
     }
 
     /// GET /api/v1/accounts/:id/statuses
@@ -175,35 +175,35 @@ impl<A: Debug + Authenticate> Client<A> {
     pub async fn poll(&self, id: &str) -> Result<Poll> {
         let url = self.base_url.join(&format!("api/v1/polls/{}", id))?;
         let response = self.send(Request::new(Method::Get, url)).await?;
-        Ok(deserialize(response).await?)
+        deserialize(response).await
     }
 
     /// GET /api/v1/instance
     pub async fn instance(&self) -> Result<Instance> {
         let url = self.base_url.join("api/v1/instance")?;
         let response = self.send(Request::new(Method::Get, url)).await?;
-        Ok(deserialize(response).await?)
+        deserialize(response).await
     }
 
     /// GET /api/v1/instance/peers
     pub async fn peers(&self) -> Result<Vec<String>> {
         let url = self.base_url.join("api/v1/instance/peers")?;
         let response = self.send(Request::new(Method::Get, url)).await?;
-        Ok(deserialize(response).await?)
+        deserialize(response).await
     }
 
     /// GET /api/v1/instance/activity
     pub async fn activity(&self) -> Result<Option<Vec<Activity>>> {
         let url = self.base_url.join("api/v1/instance/activity")?;
         let response = self.send(Request::new(Method::Get, url)).await?;
-        Ok(deserialize(response).await?)
+        deserialize(response).await
     }
 
     /// GET /api/v1/custom_emojis
     pub async fn custom_emojis(&self) -> Result<Vec<Emoji>> {
         let url = self.base_url.join("api/v1/custom_emojis")?;
         let response = self.send(Request::new(Method::Get, url)).await?;
-        Ok(deserialize(response).await?)
+        deserialize(response).await
     }
 
     /// GET /api/v1/directory
@@ -217,7 +217,7 @@ impl<A: Debug + Authenticate> Client<A> {
             url.set_query(Some(&qs[..]));
         }
         let response = self.send(Request::new(Method::Get, url)).await?;
-        Ok(deserialize(response).await?)
+        deserialize(response).await
     }
 
     /// GET /api/v1/trends
@@ -227,7 +227,7 @@ impl<A: Debug + Authenticate> Client<A> {
             url.set_query(Some(&format!("?limit={}", limit)));
         }
         let response = self.send(Request::new(Method::Get, url)).await?;
-        Ok(deserialize(response).await?)
+        deserialize(response).await
     }
 }
 
@@ -249,7 +249,7 @@ async fn deserialize<T: serde::de::DeserializeOwned>(mut response: Response) -> 
         Ok(t) => {
             log::debug!("{}", String::from_utf8_lossy(&bytes));
             t
-        },
+        }
         Err(e) => {
             log::error!("{}", String::from_utf8_lossy(&bytes));
             let err = if let Ok(error) = serde_json::from_slice(&bytes) {
@@ -258,6 +258,6 @@ async fn deserialize<T: serde::de::DeserializeOwned>(mut response: Response) -> 
                 e.into()
             };
             return Err(err);
-        },
+        }
     })
 }

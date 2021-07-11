@@ -40,7 +40,7 @@ impl<'client, T: serde::de::DeserializeOwned, A: Authenticate + Debug + 'client>
         } else {
             return Ok(None);
         };
-        Ok(self.send(req).await?)
+        self.send(req).await
     }
 
     pub async fn prev_page(&mut self) -> Result<Option<Vec<T>>> {
@@ -49,7 +49,7 @@ impl<'client, T: serde::de::DeserializeOwned, A: Authenticate + Debug + 'client>
         } else {
             return Ok(None);
         };
-        Ok(self.send(req).await?)
+        self.send(req).await
     }
 
     async fn send(&mut self, mut req: Request) -> Result<Option<Vec<T>>> {

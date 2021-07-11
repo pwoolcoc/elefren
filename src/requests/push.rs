@@ -45,7 +45,7 @@ impl Keys {
 ///
 /// ```no_run
 /// # extern crate elefren;
-/// # use elefren::{MastodonClient, Mastodon, Data};
+/// # use elefren::{Mastodon, Data};
 /// # fn main() -> Result<(), elefren::Error> {
 /// # let data = Data {
 /// #   base: "".into(),
@@ -219,7 +219,7 @@ impl AddPushRequest {
 ///
 /// ```no_run
 /// # extern crate elefren;
-/// # use elefren::{MastodonClient, Mastodon, Data};
+/// # use elefren::{Mastodon, Data};
 /// # fn main() -> Result<(), elefren::Error> {
 /// # let data = Data {
 /// #   base: "".into(),
@@ -597,9 +597,7 @@ mod tests {
             form,
             update_data::Form {
                 id: "some-id".to_string(),
-                data: update_data::Data {
-                    alerts: None
-                },
+                data: update_data::Data { alerts: None },
             }
         );
     }

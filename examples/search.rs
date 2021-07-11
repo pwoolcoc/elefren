@@ -2,7 +2,6 @@
 #![cfg_attr(not(feature = "toml"), allow(unused_imports))]
 mod register;
 
-use crate::register::MastodonClient;
 use std::error;
 
 #[cfg(feature = "toml")]

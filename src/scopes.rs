@@ -9,9 +9,7 @@ use std::{
 use crate::errors::Error;
 use serde::{
     de::{self, Visitor},
-    Deserialize,
-    Deserializer,
-    Serialize,
+    Deserialize, Deserializer, Serialize,
 };
 
 /// Represents a set of OAuth scopes
@@ -37,12 +35,10 @@ impl FromStr for Scopes {
     fn from_str(s: &str) -> Result<Scopes, Self::Err> {
         let mut set = HashSet::new();
         for scope in s.split_whitespace() {
-            let scope = Scope::from_str(&scope)?;
+            let scope = Scope::from_str(scope)?;
             set.insert(scope);
         }
-        Ok(Scopes {
-            scopes: set,
-        })
+        Ok(Scopes { scopes: set })
     }
 }
 
@@ -215,9 +211,7 @@ impl Scopes {
     /// ```
     pub fn and(self, other: Scopes) -> Scopes {
         let newset: HashSet<_> = self.scopes.union(&other.scopes).copied().collect();
-        Scopes {
-            scopes: newset,
-        }
+        Scopes { scopes: newset }
     }
 
     fn _write(subscope: Option<Write>) -> Scopes {
@@ -231,9 +225,7 @@ impl Scopes {
     fn new(scope: Scope) -> Scopes {
         let mut set = HashSet::new();
         set.insert(scope);
-        Scopes {
-            scopes: set,
-        }
+        Scopes { scopes: set }
     }
 }
 
@@ -266,7 +258,7 @@ impl fmt::Debug for Scopes {
         for scope in &self.scopes {
             write!(f, "{:?}", &scope)?;
         }
-        Ok(write!(f, "]")?)
+        write!(f, "]")
     }
 }
 
@@ -321,11 +313,11 @@ impl FromStr for Scope {
             read if read.starts_with("read:") => {
                 let r: Read = Read::from_str(&read[5..])?;
                 Scope::Read(Some(r))
-            },
+            }
             write if write.starts_with("write:") => {
                 let w: Write = Write::from_str(&write[6..])?;
                 Scope::Write(Some(w))
-            },
+            }
             _ => return Err(Error::Other("Unknown scope".to_string())),
         })
     }

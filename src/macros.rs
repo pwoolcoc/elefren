@@ -134,7 +134,7 @@ macro_rules! route_v2 {
 
                 let url = format!(concat!("/api/v2/", $url, "?{}"), &qs);
 
-                Ok(self.get(self.route(&url))?)
+                self.get(self.route(&url))
             }
         }
 
@@ -177,7 +177,7 @@ macro_rules! route {
 
                 let url = format!(concat!("/api/v1/", $url, "?{}"), &qs);
 
-                Ok(self.get(self.route(&url))?)
+                self.get(self.route(&url))
             }
         }
 

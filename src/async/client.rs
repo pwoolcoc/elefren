@@ -48,5 +48,5 @@ pub(super) async fn fetch(req: Request) -> Result<Response> {
 
 pub(super) async fn get(url: Url) -> Result<Response> {
     let req = Request::new(Method::Get, url);
-    Ok(fetch(req).await?)
+    fetch(req).await
 }

@@ -96,7 +96,9 @@ impl<'a> Registration<'a> {
     fn send(&self, req: RequestBuilder) -> Result<Response> {
         let req = req.build()?;
         let handle = tokio::runtime::Handle::current();
-        Ok(handle.block_on(self.client.execute(req))?)
+        handle
+            .block_on(self.client.execute(req))
+            .map_err(Error::from)
     }
 
     /// Register the given application
@@ -176,7 +178,9 @@ impl<'a> Registration<'a> {
     fn send_app(&self, app: &App) -> Result<OAuth> {
         let url = format!("{}/api/v1/apps", self.base);
         let handle = tokio::runtime::Handle::current();
-        Ok(handle.block_on(self.send(self.client.post(&url).json(&app))?.json())?)
+        handle
+            .block_on(self.send(self.client.post(&url).json(&app))?.json())
+            .map_err(Error::from)
     }
 }
 
@@ -233,7 +237,9 @@ impl Registered {
     fn send(&self, req: RequestBuilder) -> Result<Response> {
         let req = req.build()?;
         let handle = tokio::runtime::Handle::current();
-        Ok(handle.block_on(self.client.execute(req))?)
+        handle
+            .block_on(self.client.execute(req))
+            .map_err(Error::from)
     }
 
     /// Returns the parts of the `Registered` struct that can be used to
@@ -321,7 +327,7 @@ impl Registered {
 
         let mut builder = MastodonBuilder::new();
         builder.client(self.client.clone()).data(data);
-        Ok(builder.build()?)
+        builder.build()
     }
 }
 

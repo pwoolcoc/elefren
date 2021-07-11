@@ -146,7 +146,9 @@ impl Mastodon {
     pub(crate) fn send_blocking(&self, req: RequestBuilder) -> Result<Response> {
         let request = req.bearer_auth(&self.token).build()?;
         let handle = tokio::runtime::Handle::current();
-        Ok(handle.block_on(self.client.execute(request))?)
+        handle
+            .block_on(self.client.execute(request))
+            .map_err(Error::from)
     }
 }
 
@@ -412,13 +414,13 @@ impl MastodonClient for Mastodon {
     /// Get all accounts that follow the authenticated user
     fn follows_me(&self) -> Result<Page<Account>> {
         let me = self.verify_credentials()?;
-        Ok(self.followers(&me.id)?)
+        self.followers(&me.id)
     }
 
     /// Get all accounts that the authenticated user follows
     fn followed_by_me(&self) -> Result<Page<Account>> {
         let me = self.verify_credentials()?;
-        Ok(self.following(&me.id)?)
+        self.following(&me.id)
     }
 
     /// returns events that are relevant to the authorized user, i.e. home
@@ -673,7 +675,7 @@ impl<R: BufRead> EventStream for R {
 
 impl EventStream for WebSocket {
     fn read_message(&mut self) -> Result<String> {
-        Ok(self.0.read_message()?.into_text()?)
+        self.0.read_message()?.into_text().map_err(Error::from)
     }
 }
 
@@ -817,13 +819,15 @@ impl MastodonUnauth {
 
 impl MastodonUnauth {
     fn route(&self, url: &str) -> Result<url::Url> {
-        Ok(self.base.join(url)?)
+        self.base.join(url).map_err(Error::from)
     }
 
     fn send_blocking(&self, req: RequestBuilder) -> Result<Response> {
         let req = req.build()?;
         let handle = tokio::runtime::Handle::current();
-        Ok(handle.block_on(self.client.execute(req))?)
+        handle
+            .block_on(self.client.execute(req))
+            .map_err(Error::from)
     }
 
     /// Get a stream of the public timeline

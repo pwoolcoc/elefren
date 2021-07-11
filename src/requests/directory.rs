@@ -75,6 +75,6 @@ impl<'a> DirectoryRequest<'a> {
     /// );
     /// ```
     pub fn to_querystring(&self) -> Result<String, Error> {
-        Ok(serde_qs::to_string(&self)?)
+        serde_qs::to_string(&self).map_err(Error::from)
     }
 }

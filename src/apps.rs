@@ -136,7 +136,7 @@ impl<'a> TryInto<App> for AppBuilder<'a> {
     type Error = Error;
 
     fn try_into(self) -> Result<App> {
-        Ok(self.build()?)
+        self.build()
     }
 }
 

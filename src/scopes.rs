@@ -258,7 +258,7 @@ impl fmt::Debug for Scopes {
         for scope in &self.scopes {
             write!(f, "{:?}", &scope)?;
         }
-        Ok(write!(f, "]")?)
+        write!(f, "]")
     }
 }
 

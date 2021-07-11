@@ -44,7 +44,17 @@ pub struct Mastodon {
 }
 
 impl Mastodon {
-    methods![get, post, delete,];
+    fn get<T: for<'de> serde::Deserialize<'de>>(&self, url: String) -> Result<T> {
+        self.send_blocking(self.client.get(&url)).and_then(deserialise_blocking)
+    }
+
+    fn post<T: for<'de> serde::Deserialize<'de>>(&self, url: String) -> Result<T> {
+        self.send_blocking(self.client.post(&url)).and_then(deserialise_blocking)
+    }
+
+    fn delete<T: for<'de> serde::Deserialize<'de>>(&self, url: String) -> Result<T> {
+        self.send_blocking(self.client.delete(&url)).and_then(deserialise_blocking)
+    }
 
     fn route(&self, url: &str) -> String {
         format!("{}{}", self.base, url)

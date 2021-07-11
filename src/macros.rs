@@ -1,19 +1,3 @@
-macro_rules! methods {
-    ($($method:ident,)+) => {
-        $(
-            fn $method<T: for<'de> serde::Deserialize<'de>>(&self, url: String)
-            -> Result<T>
-            {
-                let response = self.send_blocking(
-                        self.client.$method(&url)
-                )?;
-
-                deserialise_blocking(response)
-            }
-         )+
-    };
-}
-
 macro_rules! paged_routes {
 
     (($method:ident) $name:ident: $url:expr => $ret:ty, $($rest:tt)*) => {

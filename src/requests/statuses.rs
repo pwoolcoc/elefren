@@ -55,21 +55,6 @@ pub struct StatusesRequest<'a> {
     exclude_reblogs: bool,
 }
 
-impl<'a> Into<Option<StatusesRequest<'a>>> for &'a mut StatusesRequest<'a> {
-    fn into(self) -> Option<StatusesRequest<'a>> {
-        Some(StatusesRequest {
-            only_media: self.only_media,
-            exclude_replies: self.exclude_replies,
-            pinned: self.pinned,
-            max_id: self.max_id.clone(),
-            since_id: self.since_id.clone(),
-            limit: self.limit,
-            min_id: self.min_id.clone(),
-            exclude_reblogs: self.exclude_reblogs,
-        })
-    }
-}
-
 impl<'a> StatusesRequest<'a> {
     /// Construct a new `StatusesRequest` object
     ///

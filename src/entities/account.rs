@@ -90,21 +90,21 @@ fn string_or_bool<'de, D: de::Deserializer<'de>>(val: D) -> ::std::result::Resul
         Str(String),
     }
 
-    Ok(match BoolOrString::deserialize(val)? {
-        BoolOrString::Bool(b) => b,
+    match BoolOrString::deserialize(val)? {
+        BoolOrString::Bool(b) => Ok(b),
         BoolOrString::Str(ref s) => {
             if s == "true" {
-                true
+                Ok(true)
             } else if s == "false" {
-                false
+                Ok(false)
             } else {
-                return Err(de::Error::invalid_value(
+                Err(de::Error::invalid_value(
                     Unexpected::Str(s),
                     &"true or false",
-                ));
+                ))
             }
         }
-    })
+    }
 }
 
 #[derive(Debug, Default, Clone, Serialize, PartialEq)]

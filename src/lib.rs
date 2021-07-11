@@ -148,20 +148,7 @@ impl Mastodon {
             .block_on(self.client.execute(request))
             .map_err(Error::from)
     }
-}
 
-impl From<Data> for Mastodon {
-    /// Creates a mastodon instance from the data struct.
-    fn from(data: Data) -> Mastodon {
-        let mut builder = MastodonBuilder::new();
-        builder.data(data);
-        builder
-            .build()
-            .expect("We know `data` is present, so this should be fine")
-    }
-}
-
-impl Mastodon {
     paged_routes! {
         (get) favourites: "favourites" => Status,
         (get) blocks: "blocks" => Account,
@@ -651,6 +638,17 @@ impl Mastodon {
     }
 }
 
+impl From<Data> for Mastodon {
+    /// Creates a mastodon instance from the data struct.
+    fn from(data: Data) -> Mastodon {
+        let mut builder = MastodonBuilder::new();
+        builder.data(data);
+        builder
+            .build()
+            .expect("We know `data` is present, so this should be fine")
+    }
+}
+
 #[derive(Debug)]
 /// WebSocket newtype so that EventStream can be implemented without coherency
 /// issues
@@ -812,9 +810,7 @@ impl MastodonUnauth {
             base: url::Url::parse(&base)?,
         })
     }
-}
 
-impl MastodonUnauth {
     fn route(&self, url: &str) -> Result<url::Url> {
         self.base.join(url).map_err(Error::from)
     }
@@ -847,9 +843,7 @@ impl MastodonUnauth {
 
         Ok(EventReader(WebSocket(client)))
     }
-}
 
-impl MastodonUnauth {
     /// GET /api/v1/statuses/:id
     pub fn get_status(&self, id: &str) -> Result<Status> {
         let route = self.route("/api/v1/statuses")?;

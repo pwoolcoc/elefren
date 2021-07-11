@@ -1,5 +1,8 @@
-use super::{deserialise_blocking, Mastodon, Result};
 use crate::entities::itemsiter::ItemsIter;
+use crate::errors::Result;
+use crate::mastodon::Mastodon;
+use crate::util::deserialise_blocking;
+
 use hyper_old_types::header::{parsing, Link, RelationType};
 use reqwest::{header::LINK, Response};
 use serde::Deserialize;

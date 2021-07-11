@@ -1,22 +1,8 @@
 use crate::errors::Error;
+use crate::requests::util::bool_qs_serialize;
+
 use serde::Serialize;
 use std::borrow::Cow;
-
-mod bool_qs_serialize {
-    use serde::Serializer;
-
-    pub fn is_false(b: &bool) -> bool {
-        !*b
-    }
-
-    pub fn serialize<S: Serializer>(b: &bool, s: S) -> Result<S::Ok, S::Error> {
-        if *b {
-            s.serialize_i64(1)
-        } else {
-            s.serialize_i64(0)
-        }
-    }
-}
 
 /// Represents the options for the directory request
 #[derive(Debug, Clone, Default, PartialEq, Serialize)]

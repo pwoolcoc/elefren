@@ -371,11 +371,11 @@ impl MastodonClient for Mastodon {
 
         if ids.len() == 1 {
             url += "id=";
-            url += &ids[0];
+            url += ids[0];
         } else {
             for id in ids {
                 url += "id[]=";
-                url += &id;
+                url += id;
                 url += "&";
             }
             url.pop();

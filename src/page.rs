@@ -204,7 +204,7 @@ fn get_links(response: &Response) -> Result<(Option<Url>, Option<Url>)> {
     if let Some(link_header) = response.headers().get(LINK) {
         let link_header = link_header.to_str()?;
         let link_header = link_header.as_bytes();
-        let link_header: Link = parsing::from_raw_str(&link_header)?;
+        let link_header: Link = parsing::from_raw_str(link_header)?;
         for value in link_header.values() {
             if let Some(relations) = value.rel() {
                 if relations.contains(&RelationType::Next) {

@@ -35,7 +35,7 @@ impl FromStr for Scopes {
     fn from_str(s: &str) -> Result<Scopes, Self::Err> {
         let mut set = HashSet::new();
         for scope in s.split_whitespace() {
-            let scope = Scope::from_str(&scope)?;
+            let scope = Scope::from_str(scope)?;
             set.insert(scope);
         }
         Ok(Scopes { scopes: set })

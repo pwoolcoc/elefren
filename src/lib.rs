@@ -83,7 +83,6 @@ pub use isolang::Language;
 pub use crate::{
     data::Data,
     errors::{ApiError, Error, Result},
-    mastodon_client::{MastodonClient, MastodonUnauthenticated},
     media_builder::MediaBuilder,
     registration::Registration,
     requests::{
@@ -105,7 +104,6 @@ pub mod entities;
 pub mod errors;
 /// Collection of helpers for serializing/deserializing `Data` objects
 pub mod helpers;
-mod mastodon_client;
 /// Constructing media attachments for a status.
 pub mod media_builder;
 /// Handling multiple pages of entities.
@@ -123,7 +121,7 @@ mod macros;
 /// Automatically import the things you need
 pub mod prelude {
     pub use crate::{
-        scopes::Scopes, Data, Mastodon, MastodonClient, NewStatus, Registration, StatusBuilder,
+        scopes::Scopes, Data, Mastodon, NewStatus, Registration, StatusBuilder,
         StatusesRequest,
     };
 }
@@ -163,10 +161,7 @@ impl From<Data> for Mastodon {
     }
 }
 
-#[async_trait::async_trait]
-impl MastodonClient for Mastodon {
-    type Stream = EventReader<WebSocket>;
-
+impl Mastodon {
     paged_routes! {
         (get) favourites: "favourites" => Status,
         (get) blocks: "blocks" => Account,
@@ -236,7 +231,8 @@ impl MastodonClient for Mastodon {
         (post) unendorse_user: "accounts/{}/unpin" => Relationship,
     }
 
-    fn add_filter(&self, request: &mut AddFilterRequest) -> Result<Filter> {
+    /// POST /api/v1/filters
+    pub fn add_filter(&self, request: &mut AddFilterRequest) -> Result<Filter> {
         let url = self.route("/api/v1/filters");
         let response = self.send_blocking(self.client.post(&url).json(&request))?;
 
@@ -252,7 +248,7 @@ impl MastodonClient for Mastodon {
     }
 
     /// PUT /api/v1/filters/:id
-    fn update_filter(&self, id: &str, request: &mut AddFilterRequest) -> Result<Filter> {
+    pub fn update_filter(&self, id: &str, request: &mut AddFilterRequest) -> Result<Filter> {
         let url = self.route(&format!("/api/v1/filters/{}", id));
         let response = self.send_blocking(self.client.put(&url).json(&request))?;
 
@@ -267,7 +263,8 @@ impl MastodonClient for Mastodon {
         deserialise_blocking(response)
     }
 
-    fn update_credentials(&self, builder: UpdateCredsRequest) -> Result<Account> {
+    /// Update credentials
+    pub fn update_credentials(&self, builder: UpdateCredsRequest) -> Result<Account> {
         let changes = builder.build()?;
         let url = self.route("/api/v1/accounts/update_credentials");
         let response = self.send_blocking(self.client.patch(&url).json(&changes))?;
@@ -284,7 +281,7 @@ impl MastodonClient for Mastodon {
     }
 
     /// Post a new status to the account.
-    fn new_status(&self, status: NewStatus) -> Result<Status> {
+    pub fn new_status(&self, status: NewStatus) -> Result<Status> {
         let response = self.send_blocking(
             self.client
                 .post(&self.route("/api/v1/statuses"))
@@ -296,7 +293,7 @@ impl MastodonClient for Mastodon {
 
     /// Get timeline filtered by a hashtag(eg. `#coffee`) either locally or
     /// federated.
-    fn get_hashtag_timeline(&self, hashtag: &str, local: bool) -> Result<Page<Status>> {
+    pub fn get_hashtag_timeline(&self, hashtag: &str, local: bool) -> Result<Page<Status>> {
         let base = "/api/v1/timelines/tag/";
         let url = if local {
             self.route(&format!("{}{}?local=1", base, hashtag))
@@ -349,7 +346,7 @@ impl MastodonClient for Mastodon {
     /// # Ok(())
     /// # }
     /// ```
-    fn statuses<'a, 'b: 'a, S>(&'b self, id: &'b str, request: S) -> Result<Page<Status>>
+    pub fn statuses<'a, 'b: 'a, S>(&'b self, id: &'b str, request: S) -> Result<Page<Status>>
     where
         S: Into<Option<StatusesRequest<'a>>>,
     {
@@ -366,7 +363,7 @@ impl MastodonClient for Mastodon {
 
     /// Returns the client account's relationship to a list of other accounts.
     /// Such as whether they follow them or vice versa.
-    fn relationships(&self, ids: &[&str]) -> Result<Page<Relationship>> {
+    pub fn relationships(&self, ids: &[&str]) -> Result<Page<Relationship>> {
         let mut url = self.route("/api/v1/accounts/relationships?");
 
         if ids.len() == 1 {
@@ -387,7 +384,7 @@ impl MastodonClient for Mastodon {
     }
 
     /// Add a push notifications subscription
-    fn add_push_subscription(&self, request: &AddPushRequest) -> Result<Subscription> {
+    pub fn add_push_subscription(&self, request: &AddPushRequest) -> Result<Subscription> {
         let request = request.build()?;
         let response = self.send_blocking(
             self.client
@@ -400,7 +397,7 @@ impl MastodonClient for Mastodon {
 
     /// Update the `data` portion of the push subscription associated with this
     /// access token
-    fn update_push_data(&self, request: &UpdatePushRequest) -> Result<Subscription> {
+    pub fn update_push_data(&self, request: &UpdatePushRequest) -> Result<Subscription> {
         let request = request.build();
         let response = self.send_blocking(
             self.client
@@ -412,13 +409,13 @@ impl MastodonClient for Mastodon {
     }
 
     /// Get all accounts that follow the authenticated user
-    fn follows_me(&self) -> Result<Page<Account>> {
+    pub fn follows_me(&self) -> Result<Page<Account>> {
         let me = self.verify_credentials()?;
         self.followers(&me.id)
     }
 
     /// Get all accounts that the authenticated user follows
-    fn followed_by_me(&self) -> Result<Page<Account>> {
+    pub fn followed_by_me(&self) -> Result<Page<Account>> {
         let me = self.verify_credentials()?;
         self.following(&me.id)
     }
@@ -453,7 +450,7 @@ impl MastodonClient for Mastodon {
     /// # Ok(())
     /// # }
     /// ```
-    fn streaming_user(&self) -> Result<Self::Stream> {
+    pub fn streaming_user(&self) -> Result<EventReader<WebSocket>> {
         let mut url: url::Url = self.route("/api/v1/streaming").parse()?;
         url.query_pairs_mut()
             .append_pair("access_token", &self.token)
@@ -476,7 +473,7 @@ impl MastodonClient for Mastodon {
     }
 
     /// returns all public statuses
-    fn streaming_public(&self) -> Result<Self::Stream> {
+    pub fn streaming_public(&self) -> Result<EventReader<WebSocket>> {
         let mut url: url::Url = self.route("/api/v1/streaming").parse()?;
         url.query_pairs_mut()
             .append_pair("access_token", &self.token)
@@ -499,7 +496,7 @@ impl MastodonClient for Mastodon {
     }
 
     /// Returns all local statuses
-    fn streaming_local(&self) -> Result<Self::Stream> {
+    pub fn streaming_local(&self) -> Result<EventReader<WebSocket>> {
         let mut url: url::Url = self.route("/api/v1/streaming").parse()?;
         url.query_pairs_mut()
             .append_pair("access_token", &self.token)
@@ -522,7 +519,7 @@ impl MastodonClient for Mastodon {
     }
 
     /// Returns all public statuses for a particular hashtag
-    fn streaming_public_hashtag(&self, hashtag: &str) -> Result<Self::Stream> {
+    pub fn streaming_public_hashtag(&self, hashtag: &str) -> Result<EventReader<WebSocket>> {
         let mut url: url::Url = self.route("/api/v1/streaming").parse()?;
         url.query_pairs_mut()
             .append_pair("access_token", &self.token)
@@ -546,7 +543,7 @@ impl MastodonClient for Mastodon {
     }
 
     /// Returns all local statuses for a particular hashtag
-    fn streaming_local_hashtag(&self, hashtag: &str) -> Result<Self::Stream> {
+    pub fn streaming_local_hashtag(&self, hashtag: &str) -> Result<EventReader<WebSocket>> {
         let mut url: url::Url = self.route("/api/v1/streaming").parse()?;
         url.query_pairs_mut()
             .append_pair("access_token", &self.token)
@@ -570,7 +567,7 @@ impl MastodonClient for Mastodon {
     }
 
     /// Returns statuses for a list
-    fn streaming_list(&self, list_id: &str) -> Result<Self::Stream> {
+    pub fn streaming_list(&self, list_id: &str) -> Result<EventReader<WebSocket>> {
         let mut url: url::Url = self.route("/api/v1/streaming").parse()?;
         url.query_pairs_mut()
             .append_pair("access_token", &self.token)
@@ -594,7 +591,7 @@ impl MastodonClient for Mastodon {
     }
 
     /// Returns all direct messages
-    fn streaming_direct(&self) -> Result<Self::Stream> {
+    pub fn streaming_direct(&self) -> Result<EventReader<WebSocket>> {
         let mut url: url::Url = self.route("/api/v1/streaming").parse()?;
         url.query_pairs_mut()
             .append_pair("access_token", &self.token)
@@ -617,7 +614,7 @@ impl MastodonClient for Mastodon {
     }
 
     /// Equivalent to /api/v1/media
-    fn media(&self, media_builder: MediaBuilder) -> Result<Attachment> {
+    pub fn media(&self, media_builder: MediaBuilder) -> Result<Attachment> {
         use reqwest::multipart::{Form, Part};
         use std::{fs::File, io::Read};
 
@@ -852,9 +849,9 @@ impl MastodonUnauth {
     }
 }
 
-impl MastodonUnauthenticated for MastodonUnauth {
+impl MastodonUnauth {
     /// GET /api/v1/statuses/:id
-    fn get_status(&self, id: &str) -> Result<Status> {
+    pub fn get_status(&self, id: &str) -> Result<Status> {
         let route = self.route("/api/v1/statuses")?;
         let route = route.join(id)?;
         let response = self.send_blocking(self.client.get(route))?;
@@ -862,7 +859,7 @@ impl MastodonUnauthenticated for MastodonUnauth {
     }
 
     /// GET /api/v1/statuses/:id/context
-    fn get_context(&self, id: &str) -> Result<Context> {
+    pub fn get_context(&self, id: &str) -> Result<Context> {
         let route = self.route("/api/v1/statuses")?;
         let route = route.join(id)?;
         let route = route.join("context")?;
@@ -871,7 +868,7 @@ impl MastodonUnauthenticated for MastodonUnauth {
     }
 
     /// GET /api/v1/statuses/:id/card
-    fn get_card(&self, id: &str) -> Result<Card> {
+    pub fn get_card(&self, id: &str) -> Result<Card> {
         let route = self.route("/api/v1/statuses")?;
         let route = route.join(id)?;
         let route = route.join("card")?;

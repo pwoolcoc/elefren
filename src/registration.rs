@@ -286,7 +286,7 @@ impl Registered {
 
     /// Returns the full url needed for authorisation. This needs to be opened
     /// in a browser.
-    pub fn authorize_url(&self) -> Result<String> {
+    pub fn authorize_url(&self) -> Result<url::Url> {
         let mut url = url::Url::parse(&self.base)?.join("/oauth/authorize")?;
 
         url.query_pairs_mut()
@@ -296,7 +296,7 @@ impl Registered {
             .append_pair("response_type", "code")
             .append_pair("force_login", &self.force_login.to_string());
 
-        Ok(url.into())
+        Ok(url)
     }
 
     /// Create an access token from the client id, client secret, and code

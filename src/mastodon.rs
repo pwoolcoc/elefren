@@ -560,7 +560,7 @@ impl Mastodon {
 impl From<Data> for Mastodon {
     /// Creates a mastodon instance from the data struct.
     fn from(data: Data) -> Mastodon {
-        let mut builder = MastodonBuilder::new();
+        let mut builder = MastodonBuilder::default();
         builder.data(data);
         builder
             .build()
@@ -583,15 +583,16 @@ pub struct MastodonBuilder {
     data: Option<Data>,
 }
 
-impl MastodonBuilder {
-
-    /// Create a new `MastodonBuilder`
-    pub fn new() -> Self {
+impl Default for MastodonBuilder {
+    fn default() -> Self {
         MastodonBuilder {
             client: None,
             data: None,
         }
     }
+}
+
+impl MastodonBuilder {
 
     /// Set the client for the mastodon object to be built
     pub fn client(&mut self, client: Client) -> &mut Self {

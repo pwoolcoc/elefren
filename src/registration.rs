@@ -327,7 +327,7 @@ impl Registered {
             token: token.access_token.into(),
         };
 
-        let mut builder = MastodonBuilder::new();
+        let mut builder = MastodonBuilder::default();
         builder.client(self.client.clone()).data(data);
         builder.build()
     }

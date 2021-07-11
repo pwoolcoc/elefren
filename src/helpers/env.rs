@@ -1,14 +1,14 @@
-use crate::{data::Data, Result};
+use crate::{data::Data, Error, Result};
 
 /// Attempts to deserialize a Data struct from the environment
 pub fn from_env() -> Result<Data> {
-    Ok(envy::from_env()?)
+    envy::from_env().map_err(Error::from)
 }
 
 /// Attempts to deserialize a Data struct from the environment. All keys are
 /// prefixed with the given prefix
 pub fn from_env_prefixed(prefix: &str) -> Result<Data> {
-    Ok(envy::prefixed(prefix).from_env()?)
+    envy::prefixed(prefix).from_env().map_err(Error::from)
 }
 
 #[cfg(test)]

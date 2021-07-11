@@ -4,16 +4,16 @@ use std::{
     path::Path,
 };
 
-use crate::{data::Data, Result};
+use crate::{data::Data, Error, Result};
 
 /// Attempts to deserialize a Data struct from a string
 pub fn from_str(s: &str) -> Result<Data> {
-    Ok(serde_json::from_str(s)?)
+    serde_json::from_str(s).map_err(Error::from)
 }
 
 /// Attempts to deserialize a Data struct from a slice of bytes
 pub fn from_slice(s: &[u8]) -> Result<Data> {
-    Ok(serde_json::from_slice(s)?)
+    serde_json::from_slice(s).map_err(Error::from)
 }
 
 /// Attempts to deserialize a Data struct from something that implements
@@ -21,24 +21,24 @@ pub fn from_slice(s: &[u8]) -> Result<Data> {
 pub fn from_reader<R: Read>(mut r: R) -> Result<Data> {
     let mut buffer = Vec::new();
     r.read_to_end(&mut buffer)?;
-    from_slice(&buffer)
+    from_slice(&buffer).map_err(Error::from)
 }
 
 /// Attempts to deserialize a Data struct from a file
 pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Data> {
     let path = path.as_ref();
     let file = File::open(path)?;
-    Ok(from_reader(file)?)
+    from_reader(file).map_err(Error::from)
 }
 
 /// Attempts to serialize a Data struct to a String
 pub fn to_string(data: &Data) -> Result<String> {
-    Ok(serde_json::to_string_pretty(data)?)
+    serde_json::to_string_pretty(data).map_err(Error::from)
 }
 
 /// Attempts to serialize a Data struct to a Vec of bytes
 pub fn to_vec(data: &Data) -> Result<Vec<u8>> {
-    Ok(serde_json::to_vec(data)?)
+    serde_json::to_vec(data).map_err(Error::from)
 }
 
 /// Attempts to serialize a Data struct to something that implements the

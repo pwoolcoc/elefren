@@ -20,5 +20,5 @@ pub fn authenticate(registration: Registered) -> Result<Mastodon> {
     let mut input = String::new();
     stdin.read_line(&mut input)?;
     let code = input.trim();
-    Ok(registration.complete(code)?)
+    registration.complete(code)
 }

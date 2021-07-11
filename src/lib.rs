@@ -87,11 +87,7 @@ pub use crate::{
     media_builder::MediaBuilder,
     registration::Registration,
     requests::{
-        AddFilterRequest,
-        AddPushRequest,
-        StatusesRequest,
-        UpdateCredsRequest,
-        UpdatePushRequest,
+        AddFilterRequest, AddPushRequest, StatusesRequest, UpdateCredsRequest, UpdatePushRequest,
     },
     status_builder::{NewStatus, StatusBuilder},
 };
@@ -127,13 +123,7 @@ mod macros;
 /// Automatically import the things you need
 pub mod prelude {
     pub use crate::{
-        scopes::Scopes,
-        Data,
-        Mastodon,
-        MastodonClient,
-        NewStatus,
-        Registration,
-        StatusBuilder,
+        scopes::Scopes, Data, Mastodon, MastodonClient, NewStatus, Registration, StatusBuilder,
         StatusesRequest,
     };
 }
@@ -156,7 +146,9 @@ impl Mastodon {
     pub(crate) fn send_blocking(&self, req: RequestBuilder) -> Result<Response> {
         let request = req.bearer_auth(&self.token).build()?;
         let handle = tokio::runtime::Handle::current();
-        Ok(handle.block_on(self.client.execute(request))?)
+        handle
+            .block_on(self.client.execute(request))
+            .map_err(Error::from)
     }
 }
 
@@ -379,11 +371,11 @@ impl MastodonClient for Mastodon {
 
         if ids.len() == 1 {
             url += "id=";
-            url += &ids[0];
+            url += ids[0];
         } else {
             for id in ids {
                 url += "id[]=";
-                url += &id;
+                url += id;
                 url += "&";
             }
             url.pop();
@@ -422,13 +414,13 @@ impl MastodonClient for Mastodon {
     /// Get all accounts that follow the authenticated user
     fn follows_me(&self) -> Result<Page<Account>> {
         let me = self.verify_credentials()?;
-        Ok(self.followers(&me.id)?)
+        self.followers(&me.id)
     }
 
     /// Get all accounts that the authenticated user follows
     fn followed_by_me(&self) -> Result<Page<Account>> {
         let me = self.verify_credentials()?;
-        Ok(self.following(&me.id)?)
+        self.following(&me.id)
     }
 
     /// returns events that are relevant to the authorized user, i.e. home
@@ -683,7 +675,7 @@ impl<R: BufRead> EventStream for R {
 
 impl EventStream for WebSocket {
     fn read_message(&mut self) -> Result<String> {
-        Ok(self.0.read_message()?.into_text()?)
+        self.0.read_message()?.into_text().map_err(Error::from)
     }
 }
 
@@ -742,18 +734,18 @@ impl<R: EventStream> EventReader<R> {
                 })?;
                 let notification = serde_json::from_str::<Notification>(&data)?;
                 Event::Notification(notification)
-            },
+            }
             "update" => {
                 let data =
                     data.ok_or_else(|| Error::Other("Missing `data` line for update".to_string()))?;
                 let status = serde_json::from_str::<Status>(&data)?;
                 Event::Update(status)
-            },
+            }
             "delete" => {
                 let data =
                     data.ok_or_else(|| Error::Other("Missing `data` line for delete".to_string()))?;
                 Event::Delete(data)
-            },
+            }
             "filters_changed" => Event::FiltersChanged,
             _ => return Err(Error::Other(format!("Unknown event `{}`", event))),
         })
@@ -827,13 +819,15 @@ impl MastodonUnauth {
 
 impl MastodonUnauth {
     fn route(&self, url: &str) -> Result<url::Url> {
-        Ok(self.base.join(url)?)
+        self.base.join(url).map_err(Error::from)
     }
 
     fn send_blocking(&self, req: RequestBuilder) -> Result<Response> {
         let req = req.build()?;
         let handle = tokio::runtime::Handle::current();
-        Ok(handle.block_on(self.client.execute(req))?)
+        handle
+            .block_on(self.client.execute(req))
+            .map_err(Error::from)
     }
 
     /// Get a stream of the public timeline
@@ -897,7 +891,7 @@ fn deserialise_blocking<T: for<'de> serde::Deserialize<'de>>(response: Response)
         Ok(t) => {
             log::debug!("{}", String::from_utf8_lossy(&bytes));
             Ok(t)
-        },
+        }
         // If deserializing into the desired type fails try again to
         // see if this is an error response.
         Err(e) => {
@@ -906,6 +900,6 @@ fn deserialise_blocking<T: for<'de> serde::Deserialize<'de>>(response: Response)
                 return Err(Error::Api(error));
             }
             Err(e.into())
-        },
+        }
     }
 }

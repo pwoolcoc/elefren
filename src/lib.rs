@@ -120,10 +120,13 @@ pub mod status_builder;
 mod macros;
 /// Automatically import the things you need
 pub mod prelude {
-    pub use crate::{
-        scopes::Scopes, Data, Mastodon, NewStatus, Registration, StatusBuilder,
-        StatusesRequest,
-    };
+    pub use crate::data::Data,
+    pub use crate::mastodon::Mastodon,
+    pub use crate::registration::Registration,
+    pub use crate::requests::StatusesRequest,
+    pub use crate::scopes::Scopes,
+    pub use crate::status_builder::NewStatus,
+    pub use crate::status_builder::StatusBuilder,
 }
 
 /// Your mastodon application client, handles all requests to and from Mastodon.
